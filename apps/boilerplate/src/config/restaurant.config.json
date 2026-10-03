@@ -1,0 +1,54 @@
+{
+  "brand": {
+    "name": "Bella Cucina",
+    "tagline": "Authentic Italian Since 1987",
+    "heroPunchline": "Where every meal feels like home.",
+    "logoUrl": "/logo.svg",
+    "faviconUrl": "/favicon.ico"
+  },
+  "theme": {
+    "primaryColor": "#c2410c",
+    "accentColor": "#facc15",
+    "fontHeading": "Playfair Display",
+    "fontBody": "Inter",
+    "radius": "0.5rem"
+  },
+  "contact": {
+    "phone": "+92 300 1234567",
+    "email": "hello@bellacucina.pk",
+    "address": "Main Boulevard, Gulberg III, Lahore, Pakistan",
+    "mapEmbedUrl": ""
+  },
+  "hours": [
+    { "day": "Monday",    "open": "11:00", "close": "22:00", "closed": false },
+    { "day": "Tuesday",   "open": "11:00", "close": "22:00", "closed": false },
+    { "day": "Wednesday", "open": "11:00", "close": "22:00", "closed": false },
+    { "day": "Thursday",  "open": "11:00", "close": "22:00", "closed": false },
+    { "day": "Friday",    "open": "11:00", "close": "23:30", "closed": false },
+    { "day": "Saturday",  "open": "10:00", "close": "23:30", "closed": false },
+    { "day": "Sunday",    "open": "10:00", "close": "21:00", "closed": false }
+  ],
+  "features": {
+    "onlineOrdering": true,
+    "reservations": true,
+    "gallery": true,
+    "reviews": true,
+    "newsletter": false
+  },
+  "currency": "PKR",
+  "payment": {
+    "provider": "pk-local",
+    "methods": ["jazzcash", "easypaisa", "cod"],
+    "codEnabled": true
+  },
+  "social": {
+    "instagram": "",
+    "facebook": "",
+    "tiktok": ""
+  },
+  "seo": {
+    "title": "Bella Cucina — Authentic Italian Restaurant",
+    "description": "Family-owned Italian restaurant serving handmade pasta.",
+    "keywords": ["italian", "restaurant", "pasta"]
+  }
+}
