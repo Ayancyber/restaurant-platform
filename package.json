@@ -1,0 +1,12 @@
+{
+  "name": "restaurant-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:boilerplate": "pnpm --filter boilerplate dev",
+    "dev:builder": "pnpm --filter builder dev",
+    "build:boilerplate": "pnpm --filter boilerplate build",
+    "build:builder": "pnpm --filter builder build"
+  },
+  "packageManager": "pnpm@9.0.0"
+}
