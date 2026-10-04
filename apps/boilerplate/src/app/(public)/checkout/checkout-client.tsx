@@ -19,15 +19,15 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useCart } from "@/hooks/use-cart";
-import { restaurantConfig } from "@/config";
+import type { RestaurantConfig } from "@/config";
 
 type OrderType = "pickup" | "delivery" | "dine-in";
 type PaymentMethod = "jazzcash" | "easypaisa" | "cod";
 
-export function CheckoutClient() {
+export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
   const router = useRouter();
   const { items, getSubtotal, clearCart } = useCart();
-  const { currency, payment: paymentConfig } = restaurantConfig;
+  const { currency, payment: paymentConfig } = settings;
 
   const [submitting, setSubmitting] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>("pickup");

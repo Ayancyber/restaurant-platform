@@ -11,15 +11,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { restaurantConfig } from "@/config";
 import { useCart } from "@/hooks/use-cart";
+import type { RestaurantConfig } from "@/config";
 
-export function Navbar() {
+export function Navbar({ settings }: { settings: RestaurantConfig }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const itemCount = useCart((s) => s.getItemCount());
   const openCart = useCart((s) => s.openCart);
-  const { brand, nav, contact } = restaurantConfig;
+  const { brand, nav, contact } = settings;
 
   useEffect(() => setMounted(true), []);
 

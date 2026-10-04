@@ -24,15 +24,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { restaurantConfig } from "@/config";
+import type { RestaurantConfig } from "@/config";
 
-export function ReservationClient() {
-  const { brand, contact, hours } = restaurantConfig;
+export function ReservationClient({ settings }: { settings: RestaurantConfig }) {
+  const { brand, contact, hours } = settings;
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [partySize, setPartySize] = useState("2");
 
-  // Min date = today, max = 60 days ahead
   const today = new Date().toISOString().split("T")[0];
   const maxDate = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -128,7 +127,6 @@ export function ReservationClient() {
       </header>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
-        {/* FORM */}
         <Card>
           <CardHeader>
             <CardTitle>Reservation Details</CardTitle>
@@ -247,7 +245,6 @@ export function ReservationClient() {
           </CardContent>
         </Card>
 
-        {/* INFO PANEL */}
         <div className="space-y-6">
           <Card>
             <CardHeader>

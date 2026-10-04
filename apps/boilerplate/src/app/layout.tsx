@@ -26,7 +26,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} antialiased`}>
-        {/* Inject theme from restaurant.config.json */}
         <style
           dangerouslySetInnerHTML={{
             __html: `:root {${Object.entries(themeToCssVars(restaurantConfig))

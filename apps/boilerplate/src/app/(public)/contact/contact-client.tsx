@@ -18,10 +18,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { restaurantConfig } from "@/config";
+import type { RestaurantConfig } from "@/config";
 
-export function ContactClient() {
-  const { brand, contact, hours, social } = restaurantConfig;
+export function ContactClient({ settings }: { settings: RestaurantConfig }) {
+  const { brand, contact, hours, social } = settings;
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 

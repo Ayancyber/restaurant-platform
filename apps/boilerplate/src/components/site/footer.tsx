@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { MapPin, Phone, Mail, Share2 } from "lucide-react";
-import { restaurantConfig } from "@/config";
+import type { RestaurantConfig } from "@/config";
 
-export function Footer() {
-  const { brand, contact, hours, social, footer, nav } = restaurantConfig;
+export function Footer({ settings }: { settings: RestaurantConfig }) {
+  const { brand, contact, hours, social, footer, nav } = settings;
 
   return (
     <footer className="border-t bg-muted/30">
       <div className="container mx-auto grid gap-10 px-4 py-12 md:grid-cols-4">
-        {/* Brand */}
         <div className="space-y-3">
           <h3 className="font-heading text-xl font-semibold">{brand.name}</h3>
           <p className="text-sm text-muted-foreground">{brand.tagline}</p>
@@ -40,7 +39,6 @@ export function Footer() {
           )}
         </div>
 
-        {/* Contact */}
         <div className="space-y-3">
           <h4 className="font-medium">{footer.contactHeading}</h4>
           <div className="space-y-2 text-sm text-muted-foreground">
@@ -63,7 +61,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Hours */}
         <div className="space-y-3">
           <h4 className="font-medium">{footer.hoursHeading}</h4>
           <ul className="space-y-1 text-sm text-muted-foreground">
@@ -76,7 +73,6 @@ export function Footer() {
           </ul>
         </div>
 
-        {/* Quick links — reuses nav links */}
         <div className="space-y-3">
           <h4 className="font-medium">{footer.exploreHeading}</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">

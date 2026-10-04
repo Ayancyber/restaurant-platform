@@ -10,9 +10,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useCart } from "@/hooks/use-cart";
-import { restaurantConfig } from "@/config";
 
-export function CartDrawer() {
+export function CartDrawer({ currency }: { currency: string }) {
   const {
     items,
     isOpen,
@@ -24,7 +23,6 @@ export function CartDrawer() {
     clearCart,
   } = useCart();
 
-  const { currency } = restaurantConfig;
   const subtotal = getSubtotal();
   const itemCount = getItemCount();
 
@@ -62,7 +60,6 @@ export function CartDrawer() {
           </div>
         ) : (
           <>
-            {/* Items list */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <ul className="space-y-4">
                 {items.map((item) => (
@@ -70,7 +67,6 @@ export function CartDrawer() {
                     key={item.id}
                     className="flex gap-4 border-b pb-4 last:border-0"
                   >
-                    {/* Image */}
                     <div className="h-20 w-20 shrink-0 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground overflow-hidden">
                       {item.image_url ? (
                         <img
@@ -83,7 +79,6 @@ export function CartDrawer() {
                       )}
                     </div>
 
-                    {/* Info */}
                     <div className="flex flex-1 flex-col justify-between">
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-medium leading-tight">
@@ -104,7 +99,6 @@ export function CartDrawer() {
                           {(item.price * item.quantity).toLocaleString()}
                         </span>
 
-                        {/* Quantity controls */}
                         <div className="flex items-center gap-2">
                           <Button
                             size="icon"
@@ -145,7 +139,6 @@ export function CartDrawer() {
               </button>
             </div>
 
-            {/* Footer with subtotal + checkout */}
             <div className="border-t bg-muted/30 px-6 py-4 space-y-4">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal</span>

@@ -1,11 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
-import { restaurantConfig } from "@/config";
+import { getSettings } from "@/lib/settings";
 import { MenuClient } from "./menu-client";
 
-export const revalidate = 60; // revalidate every 60s
+export const dynamic = "force-dynamic";
 
 export default async function MenuPage() {
   const supabase = await createClient();
+  const settings = await getSettings();
 
   const { data: categories } = await supabase
     .from("menu_categories")
@@ -19,8 +20,6 @@ export default async function MenuPage() {
     .eq("is_available", true)
     .order("sort_order");
 
-  const { brand, currency } = restaurantConfig;
-
   return (
     <div className="container mx-auto px-4 py-16">
       <header className="mb-12 text-center">
@@ -28,14 +27,14 @@ export default async function MenuPage() {
           Our Menu
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          {brand.tagline}
+          {settings.brand.tagline}
         </p>
       </header>
 
       <MenuClient
         categories={categories ?? []}
         items={items ?? []}
-        currency={currency}
+        currency={settings.currency}
       />
     </div>
   );

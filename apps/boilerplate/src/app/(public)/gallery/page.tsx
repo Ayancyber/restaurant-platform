@@ -1,12 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
-import { restaurantConfig } from "@/config";
+import { getSettings } from "@/lib/settings";
 import { redirect } from "next/navigation";
 import { GalleryClient } from "./gallery-client";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function GalleryPage() {
-  if (!restaurantConfig.features.gallery) {
+  const settings = await getSettings();
+
+  if (!settings.features.gallery) {
     redirect("/");
   }
 
@@ -18,8 +20,6 @@ export default async function GalleryPage() {
     .eq("is_active", true)
     .order("sort_order");
 
-  const { brand } = restaurantConfig;
-
   return (
     <div className="container mx-auto px-4 py-16">
       <header className="mb-12 text-center">
@@ -27,7 +27,7 @@ export default async function GalleryPage() {
           Gallery
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          A glimpse into {brand.name} — our food, our space, our story.
+          A glimpse into {settings.brand.name} — our food, our space, our story.
         </p>
       </header>
 

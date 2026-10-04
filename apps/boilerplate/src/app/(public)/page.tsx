@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
-import { restaurantConfig } from "@/config";
+import { getSettings } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const supabase = await createClient();
-  const { brand, contact, hours, currency, home } = restaurantConfig;
+  const settings = await getSettings();
+  const { brand, contact, hours, currency, home } = settings;
 
   const { data: featuredItems } = await supabase
     .from("menu_items")
@@ -22,7 +25,6 @@ export default async function Home() {
 
   return (
     <>
-      {/* HERO */}
       {home.sections.hero && (
         <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-gradient-to-br from-primary/10 via-background to-accent/10">
           <div className="container mx-auto px-4 py-20 text-center">
@@ -52,7 +54,6 @@ export default async function Home() {
         </section>
       )}
 
-      {/* QUICK INFO */}
       {home.sections.quickInfo && (
         <section className="border-y bg-muted/30">
           <div className="container mx-auto grid gap-6 px-4 py-8 sm:grid-cols-3">
@@ -92,7 +93,6 @@ export default async function Home() {
         </section>
       )}
 
-      {/* FEATURED */}
       {home.sections.featured && (
         <section className="container mx-auto px-4 py-20">
           <div className="mb-12 text-center">
