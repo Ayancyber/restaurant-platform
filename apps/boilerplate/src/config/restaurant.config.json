@@ -13,6 +13,45 @@
     "fontBody": "Inter",
     "radius": "0.5rem"
   },
+  "nav": {
+    "links": [
+      { "href": "/", "label": "Home" },
+      { "href": "/menu", "label": "Menu" },
+      { "href": "/reservations", "label": "Reservations" },
+      { "href": "/gallery", "label": "Gallery" },
+      { "href": "/contact", "label": "Contact" }
+    ],
+    "ctaLabel": "Cart",
+    "ctaHref": "/cart",
+    "showPhone": true
+  },
+  "home": {
+    "sections": {
+      "hero": true,
+      "quickInfo": true,
+      "featured": true
+    },
+    "hero": {
+      "badge": "Authentic Italian Since 1987",
+      "primaryCta": { "label": "View Menu", "href": "/menu" },
+      "secondaryCta": { "label": "Book a Table", "href": "/reservations" }
+    },
+    "featured": {
+      "heading": "Featured Dishes",
+      "subheading": "Handpicked favorites from our kitchen",
+      "limit": 6,
+      "ctaLabel": "See Full Menu"
+    }
+  },
+  "footer": {
+    "contactHeading": "Contact",
+    "hoursHeading": "Hours",
+    "exploreHeading": "Explore",
+    "hoursToShow": 4,
+    "copyright": "All rights reserved.",
+    "madeIn": "Made with ❤️ in Pakistan",
+    "showSocial": true
+  },
   "contact": {
     "phone": "+92 300 1234567",
     "email": "hello@bellacucina.pk",
@@ -42,8 +81,8 @@
     "codEnabled": true
   },
   "social": {
-    "instagram": "",
-    "facebook": "",
+    "instagram": "https://instagram.com/bellacucina",
+    "facebook": "https://facebook.com/bellacucina",
     "tiktok": ""
   },
   "seo": {
