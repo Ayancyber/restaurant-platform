@@ -1,0 +1,37 @@
+import { createClient } from "@/lib/supabase/server";
+import { restaurantConfig } from "@/config";
+import { redirect } from "next/navigation";
+import { GalleryClient } from "./gallery-client";
+
+export const revalidate = 60;
+
+export default async function GalleryPage() {
+  if (!restaurantConfig.features.gallery) {
+    redirect("/");
+  }
+
+  const supabase = await createClient();
+
+  const { data: images } = await supabase
+    .from("gallery")
+    .select("id, title, description, image_url, sort_order")
+    .eq("is_active", true)
+    .order("sort_order");
+
+  const { brand } = restaurantConfig;
+
+  return (
+    <div className="container mx-auto px-4 py-16">
+      <header className="mb-12 text-center">
+        <h1 className="font-heading text-4xl font-bold sm:text-5xl">
+          Gallery
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground">
+          A glimpse into {brand.name} — our food, our space, our story.
+        </p>
+      </header>
+
+      <GalleryClient images={images ?? []} />
+    </div>
+  );
+}
