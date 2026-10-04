@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-/* =====================================================
-   THEME — overridden at runtime by restaurant.config.json
-   via the <style> tag in layout.tsx
-   ===================================================== */
 :root {
   --primary: #c2410c;
   --accent: #facc15;
@@ -15,6 +11,10 @@
   --border: #e4e4e7;
   --card: #ffffff;
   --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --input: #e4e4e7;
+  --ring: #c2410c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,6 +26,10 @@
     --border: #27272a;
     --card: #18181b;
     --card-foreground: #fafafa;
+    --popover: #18181b;
+    --popover-foreground: #fafafa;
+    --input: #27272a;
+    --ring: #c2410c;
   }
 }
 
@@ -39,6 +43,10 @@
   --color-border: var(--border);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
   --font-heading: var(--font-heading);
   --font-body: var(--font-body);
