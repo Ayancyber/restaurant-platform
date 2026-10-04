@@ -41,14 +41,13 @@ export function MenuClient({
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [search, setSearch] = useState("");
   const addItem = useCart((s) => s.addItem);
+  const openCart = useCart((s) => s.openCart);
 
   const filtered = useMemo(() => {
     let result = items;
-
     if (activeCategory !== "all") {
       result = result.filter((i) => i.category_id === activeCategory);
     }
-
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -57,7 +56,6 @@ export function MenuClient({
           i.description?.toLowerCase().includes(q)
       );
     }
-
     return result;
   }, [items, activeCategory, search]);
 
@@ -69,11 +67,12 @@ export function MenuClient({
       image_url: item.image_url,
     });
     toast.success(`${item.name} added to cart`);
+    // Optional: open cart drawer automatically
+    // openCart();
   };
 
   return (
     <>
-      {/* Search bar */}
       <div className="mx-auto mb-8 max-w-md relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
@@ -84,7 +83,6 @@ export function MenuClient({
         />
       </div>
 
-      {/* Category tabs */}
       <Tabs
         value={activeCategory}
         onValueChange={setActiveCategory}
@@ -100,7 +98,6 @@ export function MenuClient({
         </TabsList>
       </Tabs>
 
-      {/* Items grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
           No items found.
