@@ -10,6 +10,8 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  Upload,
+  ImageOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -66,15 +68,47 @@ export function MenuAdminClient({
   const [editing, setEditing] = useState<MenuItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   function openNew() {
     setEditing(null);
+    setPreviewUrl("");
     setDialogOpen(true);
   }
 
   function openEdit(item: MenuItem) {
     setEditing(item);
+    setPreviewUrl(item.image_url ?? "");
     setDialogOpen(true);
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        toast.error(result.error || "Upload failed");
+        return;
+      }
+      setPreviewUrl(result.url);
+      toast.success("Image uploaded");
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload error");
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -93,7 +127,7 @@ export function MenuAdminClient({
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       price: Number(formData.get("price")),
-      image_url: formData.get("image_url") as string,
+      image_url: previewUrl || "",
       is_available: formData.get("is_available") === "on",
       is_featured: formData.get("is_featured") === "on",
       tags,
@@ -204,6 +238,19 @@ export function MenuAdminClient({
           {items.map((item) => (
             <Card key={item.id}>
               <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                {/* Thumbnail */}
+                <div className="w-16 h-16 rounded-md bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <ImageOff className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </div>
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-medium">{item.name}</h3>
@@ -296,19 +343,57 @@ export function MenuAdminClient({
         </div>
       )}
 
-      {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editing ? "Edit Menu Item" : "Add Menu Item"}
             </DialogTitle>
-            <DialogDescription>
-              Fill in the details below.
-            </DialogDescription>
+            <DialogDescription>Fill in the details below.</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Image upload */}
+            <div className="space-y-2">
+              <Label>Image</Label>
+              {previewUrl ? (
+                <div className="relative aspect-video rounded-md overflow-hidden bg-muted">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="aspect-video rounded-md border-2 border-dashed flex items-center justify-center text-muted-foreground">
+                  <ImageOff className="h-8 w-8" />
+                </div>
+              )}
+
+              <label className="cursor-pointer block">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                <div className="w-full h-10 inline-flex items-center justify-center gap-2 rounded-md border bg-background hover:bg-muted text-sm font-medium cursor-pointer">
+                  {uploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      {previewUrl ? "Replace Image" : "Upload Image"}
+                    </>
+                  )}
+                </div>
+              </label>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>
               <Input
@@ -374,17 +459,6 @@ export function MenuAdminClient({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image_url">Image URL</Label>
-              <Input
-                id="image_url"
-                name="image_url"
-                type="url"
-                placeholder="https://..."
-                defaultValue={editing?.image_url ?? ""}
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="tags">Tags (comma-separated)</Label>
               <Input
                 id="tags"
@@ -428,7 +502,7 @@ export function MenuAdminClient({
               <Button
                 type="submit"
                 className="flex-1 gap-2"
-                disabled={submitting}
+                disabled={submitting || uploading}
               >
                 {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                 {editing ? "Save Changes" : "Create Item"}
