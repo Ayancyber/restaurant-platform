@@ -133,23 +133,23 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
       </header>
 
       <Tabs defaultValue="brand">
-        <TabsList className="flex-wrap h-auto">
-          <TabsTrigger value="brand" className="gap-2">
+        <TabsList className="grid grid-cols-3 w-full h-auto gap-1 md:flex md:w-auto md:justify-start">
+          <TabsTrigger value="brand" className="gap-2 justify-center md:justify-start">
             <Store className="h-4 w-4" /> Brand
           </TabsTrigger>
-          <TabsTrigger value="contact" className="gap-2">
+          <TabsTrigger value="contact" className="gap-2 justify-center md:justify-start">
             <Phone className="h-4 w-4" /> Contact
           </TabsTrigger>
-          <TabsTrigger value="hours" className="gap-2">
+          <TabsTrigger value="hours" className="gap-2 justify-center md:justify-start">
             <Clock className="h-4 w-4" /> Hours
           </TabsTrigger>
-          <TabsTrigger value="payments" className="gap-2">
+          <TabsTrigger value="payments" className="gap-2 justify-center md:justify-start">
             <CreditCard className="h-4 w-4" /> Payments
           </TabsTrigger>
-          <TabsTrigger value="social" className="gap-2">
+          <TabsTrigger value="social" className="gap-2 justify-center md:justify-start">
             <Share2 className="h-4 w-4" /> Social
           </TabsTrigger>
-          <TabsTrigger value="seo" className="gap-2">
+          <TabsTrigger value="seo" className="gap-2 justify-center md:justify-start">
             <Search className="h-4 w-4" /> SEO
           </TabsTrigger>
         </TabsList>

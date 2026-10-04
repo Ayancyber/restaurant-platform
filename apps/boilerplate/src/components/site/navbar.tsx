@@ -83,13 +83,13 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
               <SheetHeader>
                 <SheetTitle>{brand.name}</SheetTitle>
               </SheetHeader>
-              <nav className="mt-6 flex flex-col gap-4">
+              <nav className="mt-6 flex flex-col gap-1 px-2">
                 {nav.links.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="text-base font-medium hover:text-primary"
+                    className="text-base font-medium hover:text-primary hover:bg-muted rounded-md px-3 py-2.5 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -97,7 +97,7 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
                 {nav.showPhone && (
                   <a
                     href={`tel:${contact.phone}`}
-                    className="flex items-center gap-2 text-base font-medium mt-4"
+                    className="flex items-center gap-2 text-base font-medium mt-4 px-3 py-2.5 hover:bg-muted rounded-md transition-colors"
                   >
                     <Phone className="h-4 w-4" />
                     {contact.phone}
