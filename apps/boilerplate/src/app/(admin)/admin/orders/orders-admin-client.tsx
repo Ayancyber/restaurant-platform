@@ -60,6 +60,7 @@ type Order = {
   total: number;
   delivery_address: string | null;
   notes: string | null;
+  customer_marked_paid_at: string | null;
   created_at: string;
 };
 
@@ -224,6 +225,11 @@ export function OrdersAdminClient({
                         >
                           {order.payment_status}
                         </Badge>
+                        {order.customer_marked_paid_at && order.payment_status === "unpaid" && (
+                          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-700 border-blue-500/20">
+                            Customer Says Paid
+                          </Badge>
+                        )}
                         <span className="text-xs text-muted-foreground">
                           {new Date(order.created_at).toLocaleString("en-PK", {
                             dateStyle: "short",
@@ -395,8 +401,7 @@ export function OrdersAdminClient({
                   </div>
                 )}
 
-                {selectedOrder.payment_status === "unpaid" &&
-                  selectedOrder.payment_method === "cod" && (
+                {selectedOrder.payment_status === "unpaid" && (
                     <Button
                       onClick={() => markPaid(selectedOrder.id)}
                       disabled={updating === selectedOrder.id}

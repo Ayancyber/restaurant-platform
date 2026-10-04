@@ -2,7 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, Store, Phone, Clock, Share2, Search } from "lucide-react";
+import {
+  Loader2,
+  Save,
+  Store,
+  Phone,
+  Clock,
+  Share2,
+  Search,
+  CreditCard,
+  Upload,
+  ImageOff,
+  MessageCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,12 +28,19 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
 
-  // Form state
   const [brand, setBrand] = useState(initial.brand);
   const [contact, setContact] = useState(initial.contact);
   const [hours, setHours] = useState(initial.hours);
   const [social, setSocial] = useState(initial.social);
   const [seo, setSeo] = useState(initial.seo);
+  const [paymentAccounts, setPaymentAccounts] = useState(
+    initial.paymentAccounts
+  );
+  const [whatsapp, setWhatsapp] = useState(initial.whatsapp);
+
+  const [uploadingQr, setUploadingQr] = useState<
+    "jazzcash" | "easypaisa" | null
+  >(null);
 
   async function handleSave() {
     setSaving(true);
@@ -29,7 +48,15 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brand, contact, hours, social, seo }),
+        body: JSON.stringify({
+          brand,
+          contact,
+          hours,
+          social,
+          seo,
+          paymentAccounts,
+          whatsapp,
+        }),
       });
       const result = await res.json();
       if (!res.ok) {
@@ -50,6 +77,40 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
     setHours((prev) =>
       prev.map((h, i) => (i === index ? { ...h, [field]: value } : h))
     );
+  }
+
+  async function handleQrUpload(
+    e: React.ChangeEvent<HTMLInputElement>,
+    method: "jazzcash" | "easypaisa"
+  ) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingQr(method);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        toast.error(result.error || "Upload failed");
+        return;
+      }
+      setPaymentAccounts((prev) => ({
+        ...prev,
+        [method]: { ...prev[method], qrCodeUrl: result.url },
+      }));
+      toast.success("QR code uploaded");
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload error");
+    } finally {
+      setUploadingQr(null);
+    }
   }
 
   return (
@@ -82,6 +143,9 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
           <TabsTrigger value="hours" className="gap-2">
             <Clock className="h-4 w-4" /> Hours
           </TabsTrigger>
+          <TabsTrigger value="payments" className="gap-2">
+            <CreditCard className="h-4 w-4" /> Payments
+          </TabsTrigger>
           <TabsTrigger value="social" className="gap-2">
             <Share2 className="h-4 w-4" /> Social
           </TabsTrigger>
@@ -90,7 +154,6 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
           </TabsTrigger>
         </TabsList>
 
-        {/* BRAND */}
         <TabsContent value="brand">
           <Card>
             <CardHeader>
@@ -113,7 +176,6 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
                   onChange={(e) =>
                     setBrand({ ...brand, tagline: e.target.value })
                   }
-                  placeholder="Authentic Italian Since 1987"
                 />
               </div>
               <div className="space-y-2">
@@ -124,14 +186,12 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
                   onChange={(e) =>
                     setBrand({ ...brand, heroPunchline: e.target.value })
                   }
-                  placeholder="Where every meal feels like home."
                 />
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* CONTACT */}
         <TabsContent value="contact">
           <Card>
             <CardHeader>
@@ -174,7 +234,6 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
           </Card>
         </TabsContent>
 
-        {/* HOURS */}
         <TabsContent value="hours">
           <Card>
             <CardHeader>
@@ -216,7 +275,246 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
           </Card>
         </TabsContent>
 
-        {/* SOCIAL */}
+        {/* PAYMENTS — NEW */}
+        <TabsContent value="payments">
+          <div className="space-y-6">
+            {/* JazzCash */}
+            <Card>
+              <CardHeader>
+                <CardTitle>JazzCash Account</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={paymentAccounts.jazzcash.enabled}
+                    onChange={(e) =>
+                      setPaymentAccounts({
+                        ...paymentAccounts,
+                        jazzcash: {
+                          ...paymentAccounts.jazzcash,
+                          enabled: e.target.checked,
+                        },
+                      })
+                    }
+                    className="rounded"
+                  />
+                  Accept JazzCash payments
+                </label>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Account Holder Name</Label>
+                    <Input
+                      value={paymentAccounts.jazzcash.accountName}
+                      onChange={(e) =>
+                        setPaymentAccounts({
+                          ...paymentAccounts,
+                          jazzcash: {
+                            ...paymentAccounts.jazzcash,
+                            accountName: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="Muhammad Ayan"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Mobile Account Number</Label>
+                    <Input
+                      value={paymentAccounts.jazzcash.accountNumber}
+                      onChange={(e) =>
+                        setPaymentAccounts({
+                          ...paymentAccounts,
+                          jazzcash: {
+                            ...paymentAccounts.jazzcash,
+                            accountNumber: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="03001234567"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>QR Code (optional)</Label>
+                  {paymentAccounts.jazzcash.qrCodeUrl ? (
+                    <div className="relative w-48 h-48 rounded-md overflow-hidden bg-muted">
+                      <img
+                        src={paymentAccounts.jazzcash.qrCodeUrl}
+                        alt="JazzCash QR"
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-48 h-48 rounded-md border-2 border-dashed flex items-center justify-center text-muted-foreground">
+                      <ImageOff className="h-8 w-8" />
+                    </div>
+                  )}
+                  <label className="cursor-pointer block">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleQrUpload(e, "jazzcash")}
+                      className="hidden"
+                      disabled={uploadingQr === "jazzcash"}
+                    />
+                    <div className="w-48 h-10 inline-flex items-center justify-center gap-2 rounded-md border bg-background hover:bg-muted text-sm font-medium cursor-pointer">
+                      {uploadingQr === "jazzcash" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4" />
+                          {paymentAccounts.jazzcash.qrCodeUrl
+                            ? "Replace QR"
+                            : "Upload QR Code"}
+                        </>
+                      )}
+                    </div>
+                  </label>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Easypaisa */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Easypaisa Account</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={paymentAccounts.easypaisa.enabled}
+                    onChange={(e) =>
+                      setPaymentAccounts({
+                        ...paymentAccounts,
+                        easypaisa: {
+                          ...paymentAccounts.easypaisa,
+                          enabled: e.target.checked,
+                        },
+                      })
+                    }
+                    className="rounded"
+                  />
+                  Accept Easypaisa payments
+                </label>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Account Holder Name</Label>
+                    <Input
+                      value={paymentAccounts.easypaisa.accountName}
+                      onChange={(e) =>
+                        setPaymentAccounts({
+                          ...paymentAccounts,
+                          easypaisa: {
+                            ...paymentAccounts.easypaisa,
+                            accountName: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Mobile Account Number</Label>
+                    <Input
+                      value={paymentAccounts.easypaisa.accountNumber}
+                      onChange={(e) =>
+                        setPaymentAccounts({
+                          ...paymentAccounts,
+                          easypaisa: {
+                            ...paymentAccounts.easypaisa,
+                            accountNumber: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>QR Code (optional)</Label>
+                  {paymentAccounts.easypaisa.qrCodeUrl ? (
+                    <div className="relative w-48 h-48 rounded-md overflow-hidden bg-muted">
+                      <img
+                        src={paymentAccounts.easypaisa.qrCodeUrl}
+                        alt="Easypaisa QR"
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-48 h-48 rounded-md border-2 border-dashed flex items-center justify-center text-muted-foreground">
+                      <ImageOff className="h-8 w-8" />
+                    </div>
+                  )}
+                  <label className="cursor-pointer block">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleQrUpload(e, "easypaisa")}
+                      className="hidden"
+                      disabled={uploadingQr === "easypaisa"}
+                    />
+                    <div className="w-48 h-10 inline-flex items-center justify-center gap-2 rounded-md border bg-background hover:bg-muted text-sm font-medium cursor-pointer">
+                      {uploadingQr === "easypaisa" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4" />
+                          {paymentAccounts.easypaisa.qrCodeUrl
+                            ? "Replace QR"
+                            : "Upload QR Code"}
+                        </>
+                      )}
+                    </div>
+                  </label>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* WhatsApp */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-primary" />
+                  WhatsApp for Payment Proof
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={whatsapp.enabled}
+                    onChange={(e) =>
+                      setWhatsapp({ ...whatsapp, enabled: e.target.checked })
+                    }
+                    className="rounded"
+                  />
+                  Send payment screenshots via WhatsApp
+                </label>
+                <div className="space-y-2">
+                  <Label>WhatsApp Number</Label>
+                  <Input
+                    value={whatsapp.number}
+                    onChange={(e) =>
+                      setWhatsapp({ ...whatsapp, number: e.target.value })
+                    }
+                    placeholder="+92 300 1234567"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
         <TabsContent value="social">
           <Card>
             <CardHeader>
@@ -231,7 +529,6 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
                   onChange={(e) =>
                     setSocial({ ...social, instagram: e.target.value })
                   }
-                  placeholder="https://instagram.com/yourhandle"
                 />
               </div>
               <div className="space-y-2">
@@ -242,7 +539,6 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
                   onChange={(e) =>
                     setSocial({ ...social, facebook: e.target.value })
                   }
-                  placeholder="https://facebook.com/yourpage"
                 />
               </div>
               <div className="space-y-2">
@@ -253,14 +549,12 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
                   onChange={(e) =>
                     setSocial({ ...social, tiktok: e.target.value })
                   }
-                  placeholder="https://tiktok.com/@yourhandle"
                 />
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* SEO */}
         <TabsContent value="seo">
           <Card>
             <CardHeader>

@@ -11,7 +11,7 @@ export default async function AdminOrdersPage() {
     supabase
       .from("orders")
       .select(
-        "id, order_number, customer_name, customer_phone, customer_email, type, status, payment_method, payment_status, subtotal, delivery_fee, total, delivery_address, notes, created_at"
+        "id, order_number, customer_name, customer_phone, customer_email, type, status, payment_method, payment_status, subtotal, delivery_fee, total, delivery_address, notes, created_at, customer_marked_paid_at"
       )
       .order("created_at", { ascending: false }),
     supabase

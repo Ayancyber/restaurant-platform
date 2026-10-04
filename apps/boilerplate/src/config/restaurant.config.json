@@ -78,7 +78,33 @@
   "payment": {
     "provider": "pk-local",
     "methods": ["jazzcash", "easypaisa", "cod"],
-    "codEnabled": true
+    "codEnabled": true,
+    "deliveryFee": 150
+  },
+  "paymentAccounts": {
+    "jazzcash": {
+      "enabled": true,
+      "accountName": "Muhammad Ayan",
+      "accountNumber": "03001234567",
+      "qrCodeUrl": ""
+    },
+    "easypaisa": {
+      "enabled": true,
+      "accountName": "Muhammad Ayan",
+      "accountNumber": "03001234567",
+      "qrCodeUrl": ""
+    },
+    "bank": {
+      "enabled": false,
+      "bankName": "",
+      "accountTitle": "",
+      "accountNumber": "",
+      "iban": ""
+    }
+  },
+  "whatsapp": {
+    "enabled": true,
+    "number": "+92 300 1234567"
   },
   "social": {
     "instagram": "https://instagram.com/bellacucina",

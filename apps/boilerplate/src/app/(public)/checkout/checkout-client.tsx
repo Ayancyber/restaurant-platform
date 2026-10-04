@@ -99,7 +99,13 @@ export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
 
       toast.success(`Order ${result.order_number} placed!`);
       clearCart();
-      router.push(`/checkout/success?order=${result.order_number}`);
+
+      // Redirect based on payment method
+      if (paymentMethod === "cod") {
+        router.push(`/checkout/success?order=${result.order_number}`);
+      } else {
+        router.push(`/checkout/pay/${result.order_id}`);
+      }
     } catch (err) {
       console.error(err);
       toast.error("Network error. Please try again.");
@@ -123,9 +129,7 @@ export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
         onSubmit={handleSubmit}
         className="grid gap-8 lg:grid-cols-[1fr_400px]"
       >
-        {/* LEFT — Details */}
         <div className="space-y-6">
-          {/* Contact */}
           <Card>
             <CardHeader>
               <CardTitle>Your Details</CardTitle>
@@ -163,7 +167,6 @@ export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
             </CardContent>
           </Card>
 
-          {/* Order type */}
           <Card>
             <CardHeader>
               <CardTitle>Order Type</CardTitle>
@@ -206,7 +209,6 @@ export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
             </CardContent>
           </Card>
 
-          {/* Payment method */}
           <Card>
             <CardHeader>
               <CardTitle>Payment Method</CardTitle>
@@ -220,28 +222,34 @@ export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {paymentConfig.methods.includes("jazzcash") && (
-                    <SelectItem value="jazzcash">JazzCash</SelectItem>
-                  )}
-                  {paymentConfig.methods.includes("easypaisa") && (
-                    <SelectItem value="easypaisa">EasyPaisa</SelectItem>
-                  )}
-                  {paymentConfig.methods.includes("cod") && (
-                    <SelectItem value="cod">Cash on Delivery</SelectItem>
-                  )}
+                  {paymentConfig.methods.includes("jazzcash") &&
+                    settings.paymentAccounts.jazzcash.enabled && (
+                      <SelectItem value="jazzcash">
+                        JazzCash — Pay via mobile wallet
+                      </SelectItem>
+                    )}
+                  {paymentConfig.methods.includes("easypaisa") &&
+                    settings.paymentAccounts.easypaisa.enabled && (
+                      <SelectItem value="easypaisa">
+                        Easypaisa — Pay via mobile wallet
+                      </SelectItem>
+                    )}
+                  {paymentConfig.methods.includes("cod") &&
+                    paymentConfig.codEnabled && (
+                      <SelectItem value="cod">Cash on Delivery</SelectItem>
+                    )}
                 </SelectContent>
               </Select>
 
               {paymentMethod !== "cod" && (
                 <p className="text-xs text-muted-foreground mt-3">
-                  You'll be redirected to complete payment after placing the
-                  order. (Payment gateway integration coming soon.)
+                  You'll be shown a QR code and account number to complete
+                  payment after placing the order.
                 </p>
               )}
             </CardContent>
           </Card>
 
-          {/* Notes */}
           <Card>
             <CardHeader>
               <CardTitle>Order Notes (optional)</CardTitle>
@@ -256,7 +264,6 @@ export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
           </Card>
         </div>
 
-        {/* RIGHT — Summary */}
         <div>
           <Card className="sticky top-24">
             <CardHeader>

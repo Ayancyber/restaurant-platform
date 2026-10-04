@@ -31,6 +31,31 @@ const settingsSchema = z.object({
     title: z.string(),
     description: z.string(),
   }).optional(),
+  paymentAccounts: z.object({
+    jazzcash: z.object({
+      enabled: z.boolean(),
+      accountName: z.string(),
+      accountNumber: z.string(),
+      qrCodeUrl: z.string().optional(),
+    }),
+    easypaisa: z.object({
+      enabled: z.boolean(),
+      accountName: z.string(),
+      accountNumber: z.string(),
+      qrCodeUrl: z.string().optional(),
+    }),
+    bank: z.object({
+      enabled: z.boolean(),
+      bankName: z.string(),
+      accountTitle: z.string(),
+      accountNumber: z.string(),
+      iban: z.string(),
+    }),
+  }).optional(),
+  whatsapp: z.object({
+    enabled: z.boolean(),
+    number: z.string(),
+  }).optional(),
 });
 
 async function requireAdmin() {
@@ -69,7 +94,6 @@ export async function POST(request: Request) {
     const supabase = createAdminClient();
     const data = parsed.data;
 
-    // Upsert each section as a separate key
     const rows = Object.entries(data)
       .filter(([, value]) => value !== undefined)
       .map(([key, value]) => ({
