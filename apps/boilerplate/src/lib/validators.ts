@@ -43,3 +43,19 @@ export const reservationSchema = z.object({
 });
 
 export type ReservationInput = z.infer<typeof reservationSchema>;
+
+// =====================================================
+// CONTACT SCHEMA
+// =====================================================
+export const contactSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email"),
+  phone: z.string().optional().or(z.literal("")),
+  subject: z.string().optional().or(z.literal("")),
+  message: z
+    .string()
+    .min(10, "Message must be at least 10 characters")
+    .max(2000, "Message too long"),
+});
+
+export type ContactInput = z.infer<typeof contactSchema>;
