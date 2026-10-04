@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Menu, ShoppingCart, Phone } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,10 +12,16 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { restaurantConfig } from "@/config";
+import { useCart } from "@/hooks/use-cart";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const itemCount = useCart((s) => s.getItemCount());
   const { brand, nav, contact } = restaurantConfig;
+
+  // Prevent hydration mismatch (cart is persisted client-side)
+  useEffect(() => setMounted(true), []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -51,10 +57,16 @@ export function Navbar() {
               {contact.phone}
             </a>
           )}
-          <Button asChild variant="default" size="sm" className="gap-2">
+
+          <Button asChild variant="default" size="sm" className="gap-2 relative">
             <Link href={nav.ctaHref}>
               <ShoppingCart className="h-4 w-4" />
               <span className="hidden sm:inline">{nav.ctaLabel}</span>
+              {mounted && itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-medium">
+                  {itemCount}
+                </span>
+              )}
             </Link>
           </Button>
 
