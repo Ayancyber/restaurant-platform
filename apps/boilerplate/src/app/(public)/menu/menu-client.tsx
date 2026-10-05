@@ -88,15 +88,16 @@ export function MenuClient({
         onValueChange={setActiveCategory}
         className="mb-10"
       >
-        <TabsList className="flex-wrap h-auto justify-center">
-          <TabsTrigger value="all">All</TabsTrigger>
+        <TabsList className="w-full justify-start overflow-x-auto flex-nowrap h-auto pb-1">
+          <TabsTrigger value="all" className="whitespace-nowrap">All</TabsTrigger>
           {categories.map((cat) => (
-            <TabsTrigger key={cat.id} value={cat.id}>
+            <TabsTrigger key={cat.id} value={cat.id} className="whitespace-nowrap">
               {cat.name}
             </TabsTrigger>
           ))}
         </TabsList>
       </Tabs>
+
 
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
