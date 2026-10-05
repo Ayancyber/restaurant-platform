@@ -103,9 +103,10 @@ export async function POST(request: Request) {
 
     const data = parsed.data as unknown as WizardData;
     const zipBuffer = await buildZip(data);
+    const zipBytes = new Uint8Array(zipBuffer);
     const filename = getZipFilename(data);
 
-    return new NextResponse(zipBuffer, {
+    return new NextResponse(zipBytes, {
       status: 200,
       headers: {
         "Content-Type": "application/zip",
