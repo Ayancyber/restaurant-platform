@@ -9,3 +9,8 @@ build/
 *.log
 .vercel
 .turbo
+
+
+# Builder template (synced via scripts/sync-boilerplate.sh)
+# Kept out of git to avoid duplicating the boilerplate source
+apps/builder/templates/boilerplate/
