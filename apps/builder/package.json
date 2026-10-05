@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prebuild": "bash ../../scripts/sync-boilerplate.sh"
+    "sync-template": "bash ../../scripts/sync-boilerplate.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
