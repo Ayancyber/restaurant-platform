@@ -186,6 +186,24 @@ export function SupabaseStep() {
             needs.
           </p>
 
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
+            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-amber-700 dark:text-amber-400">
+                Important: Choose &quot;Run without RLS&quot; in Supabase
+              </p>
+              <p className="text-muted-foreground mt-0.5">
+                When you paste this SQL and click Run, Supabase may show a
+                dialog saying &quot;Potential issues detected&quot;. Choose{" "}
+                <span className="font-medium text-foreground">
+                  Run without RLS
+                </span>{" "}
+                — NOT &quot;Run and enable RLS&quot;. This SQL already defines
+                its own security policies.
+              </p>
+            </div>
+          </div>
+
           <div className="rounded-lg border bg-muted/30 overflow-hidden">
             <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/50">
               <div className="flex items-center gap-2 text-xs">

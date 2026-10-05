@@ -16,8 +16,6 @@ export function generateSQL(data: WizardData): string {
   if (features.onlineOrdering) sections.push(ordersTables());
   if (features.reservations) sections.push(reservationsTable());
   if (features.gallery) sections.push(galleryTable());
-  if (features.reviews) sections.push(reviewsTable());
-  if (features.newsletter) sections.push(newsletterTable());
 
   sections.push(siteSettingsTable());
   sections.push(contactMessagesTable());
@@ -196,33 +194,7 @@ create table if not exists public.gallery (
 );`;
 }
 
-function reviewsTable() {
-  return `-- =====================================================================
--- REVIEWS
--- =====================================================================
 
-create table if not exists public.reviews (
-  id uuid primary key default uuid_generate_v4(),
-  customer_name text not null,
-  rating int not null check (rating between 1 and 5),
-  comment text,
-  is_approved boolean not null default false,
-  created_at timestamptz not null default now()
-);`;
-}
-
-function newsletterTable() {
-  return `-- =====================================================================
--- NEWSLETTER SUBSCRIBERS
--- =====================================================================
-
-create table if not exists public.newsletter_subscribers (
-  id uuid primary key default uuid_generate_v4(),
-  email text unique not null,
-  subscribed_at timestamptz not null default now(),
-  is_active boolean not null default true
-);`;
-}
 
 function siteSettingsTable() {
   return `-- =====================================================================
@@ -327,13 +299,9 @@ function rlsPolicies(features: WizardData["features"]) {
 -- =====================================================================
 -- Public can READ, admins can WRITE. This is critical for security.`);
 
-  const publicReadTables = [
-    "menu_categories",
-    "menu_items",
-    "gallery",
-    "reviews",
-    "site_settings",
-  ];
+  // Public read tables — always include menu, settings
+  const publicReadTables = ["menu_categories", "menu_items", "site_settings"];
+  if (features.gallery) publicReadTables.push("gallery");
   if (features.onlineOrdering) publicReadTables.push("orders", "order_items");
   if (features.reservations) publicReadTables.push("reservations");
 
@@ -347,15 +315,14 @@ create policy "Public read ${table}"
   using (true);`);
   }
 
-  // Admin-only write tables
+  // Admin write tables
   const adminWriteTables = [
     "menu_categories",
     "menu_items",
-    "gallery",
-    "reviews",
     "site_settings",
     "contact_messages",
   ];
+  if (features.gallery) adminWriteTables.push("gallery");
   if (features.onlineOrdering) adminWriteTables.push("orders", "order_items");
   if (features.reservations) adminWriteTables.push("reservations");
 
@@ -379,11 +346,10 @@ create policy "Admin write ${table}"
   );`);
   }
 
-  // Public can insert (contact, reservations, orders)
+  // Public insert tables
   const publicInsertTables = ["contact_messages"];
   if (features.onlineOrdering) publicInsertTables.push("orders", "order_items");
   if (features.reservations) publicInsertTables.push("reservations");
-  if (features.newsletter) publicInsertTables.push("newsletter_subscribers");
 
   for (const table of publicInsertTables) {
     lines.push(`
@@ -393,7 +359,7 @@ create policy "Public insert ${table}"
   with check (true);`);
   }
 
-  // Profiles: user can read own, admin can read all
+  // Profiles policies
   lines.push(`
 alter table public.profiles enable row level security;
 

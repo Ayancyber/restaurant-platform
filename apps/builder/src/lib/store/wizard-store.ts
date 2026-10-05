@@ -31,8 +31,6 @@ export type WizardData = {
     onlineOrdering: boolean;
     reservations: boolean;
     gallery: boolean;
-    reviews: boolean;
-    newsletter: boolean;
   };
   paymentAccounts: {
     jazzcash: {
@@ -90,8 +88,6 @@ const defaultData: WizardData = {
     onlineOrdering: true,
     reservations: true,
     gallery: true,
-    reviews: true,
-    newsletter: false,
   },
   paymentAccounts: {
     jazzcash: {

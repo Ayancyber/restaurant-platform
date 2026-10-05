@@ -2,21 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useWizardStore } from "@/lib/store/wizard-store";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
   ShoppingBag,
   CalendarDays,
   Image as ImageIcon,
-  Star,
-  Mail,
   CheckCircle2,
   XCircle,
 } from "lucide-react";
 
-type FeatureKey = "onlineOrdering" | "reservations" | "gallery" | "reviews" | "newsletter";
+type FeatureKey = "onlineOrdering" | "reservations" | "gallery";
 
 const FEATURES: {
   key: FeatureKey;
@@ -28,14 +24,14 @@ const FEATURES: {
     key: "onlineOrdering",
     title: "Online Ordering",
     description:
-      "Customers browse the menu, add items to cart, and place orders for pickup or delivery.",
+      "Customers browse the menu, add items to cart, and place orders for pickup or delivery. Includes order tracking and payment QR codes.",
     icon: ShoppingBag,
   },
   {
     key: "reservations",
     title: "Table Reservations",
     description:
-      "Customers book tables online with date, time, and party size. You manage from admin.",
+      "Customers book tables online with date, time, and party size. You manage confirmations from the admin panel.",
     icon: CalendarDays,
   },
   {
@@ -44,20 +40,6 @@ const FEATURES: {
     description:
       "Display restaurant photos, food shots, and interior images with lightbox viewing.",
     icon: ImageIcon,
-  },
-  {
-    key: "reviews",
-    title: "Customer Reviews",
-    description:
-      "Let customers leave reviews and ratings on your site. Moderation via admin.",
-    icon: Star,
-  },
-  {
-    key: "newsletter",
-    title: "Newsletter Signup",
-    description:
-      "Collect emails from interested customers. Optional — most restaurants skip this.",
-    icon: Mail,
   },
 ];
 
@@ -86,14 +68,14 @@ export function FeaturesStep() {
     return <div className="h-96 animate-pulse bg-muted rounded-md" />;
   }
 
-  const enabledCount = Object.values(features).filter(Boolean).length;
+  const enabledCount = FEATURES.filter((f) => features[f.key]).length;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Badge variant="secondary">
+        <div className="text-sm text-muted-foreground">
           {enabledCount} of {FEATURES.length} enabled
-        </Badge>
+        </div>
         <p className="text-sm text-muted-foreground">
           Only enabled features appear on your public site.
         </p>
