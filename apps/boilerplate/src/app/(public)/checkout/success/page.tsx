@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { restaurantConfig } from "@/config";
@@ -25,7 +25,7 @@ export default async function SuccessPage({
           </h1>
 
           <p className="mt-3 text-muted-foreground">
-            Thank you for ordering from {brand.name}. We're preparing your
+            Thank you for ordering from {brand.name}. We&apos;re preparing your
             meal now.
           </p>
 
@@ -37,13 +37,21 @@ export default async function SuccessPage({
           )}
 
           <p className="mt-6 text-sm text-muted-foreground">
-            We'll contact you at{" "}
+            We&apos;ll contact you at{" "}
             <span className="font-medium text-foreground">{contact.phone}</span>{" "}
             if we need anything.
           </p>
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Button asChild>
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center flex-wrap">
+            {order && (
+              <Button asChild size="lg" className="gap-2">
+                <Link href={`/orders/${order}`}>
+                  <Package className="h-4 w-4" />
+                  Track Your Order
+                </Link>
+              </Button>
+            )}
+            <Button asChild variant="outline">
               <Link href="/menu">
                 Order More <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

@@ -264,8 +264,8 @@ export function PaymentClient({
 
       <div className="text-center space-y-3">
         <Button asChild variant="outline">
-          <Link href={`/checkout/success?order=${order.order_number}`}>
-            View Order Details <ArrowRight className="ml-2 h-4 w-4" />
+          <Link href={`/orders/${order.order_number}`}>
+            Track Your Order <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
         <div>

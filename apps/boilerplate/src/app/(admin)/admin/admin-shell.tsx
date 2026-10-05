@@ -11,6 +11,7 @@ import {
   Image as ImageIcon,
   MessageSquare,
   Settings,
+  Tags,
   LogOut,
   Menu,
   Home,
@@ -24,7 +25,8 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
+  { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed, exact: true },
+  { href: "/admin/menu/categories", label: "Categories", icon: Tags, exact: true },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/reservations", label: "Reservations", icon: CalendarDays },
   { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },

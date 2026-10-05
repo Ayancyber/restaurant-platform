@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, ShoppingCart, Phone } from "lucide-react";
+import { Menu, ShoppingCart, Phone, Package } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useCart } from "@/hooks/use-cart";
+import { useRecentOrders } from "@/lib/hooks/use-recent-orders";
 import type { RestaurantConfig } from "@/config";
 
 export function Navbar({ settings }: { settings: RestaurantConfig }) {
@@ -19,9 +20,13 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
   const [mounted, setMounted] = useState(false);
   const itemCount = useCart((s) => s.getItemCount());
   const openCart = useCart((s) => s.openCart);
+  const { orders: recentOrders, mounted: recentsMounted } = useRecentOrders();
   const { brand, nav, contact } = settings;
 
   useEffect(() => setMounted(true), []);
+
+  const hasRecent = recentsMounted && recentOrders.length > 0;
+  const mostRecent = hasRecent ? recentOrders[0] : null;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -35,7 +40,7 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {nav.links.map((link) => (
             <Link
               key={link.href}
@@ -45,13 +50,23 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/track-order"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5 relative"
+          >
+            <Package className="h-3.5 w-3.5" />
+            Track Order
+            {hasRecent && (
+              <span className="h-1.5 w-1.5 rounded-full bg-primary absolute -top-0.5 -right-2" />
+            )}
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
           {nav.showPhone && (
             <a
               href={`tel:${contact.phone}`}
-              className="hidden md:flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+              className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
               <Phone className="h-4 w-4" />
               {contact.phone}
@@ -94,6 +109,28 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
                     {link.label}
                   </Link>
                 ))}
+                <Link
+                  href="/track-order"
+                  onClick={() => setOpen(false)}
+                  className="text-base font-medium hover:text-primary hover:bg-muted rounded-md px-3 py-2.5 transition-colors flex items-center gap-2 relative"
+                >
+                  <Package className="h-4 w-4" />
+                  Track Order
+                  {hasRecent && (
+                    <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-auto">
+                      {recentOrders.length}
+                    </span>
+                  )}
+                </Link>
+                {hasRecent && mostRecent && (
+                  <Link
+                    href={`/orders/${mostRecent.orderNumber}`}
+                    onClick={() => setOpen(false)}
+                    className="text-xs text-muted-foreground hover:text-primary rounded-md px-3 py-2 transition-colors -mt-1 ml-6"
+                  >
+                    ↳ Recent: {mostRecent.orderNumber}
+                  </Link>
+                )}
                 {nav.showPhone && (
                   <a
                     href={`tel:${contact.phone}`}
