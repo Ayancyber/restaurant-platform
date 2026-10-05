@@ -3,25 +3,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// The full wizard data — grows as user fills each step
 export type WizardData = {
-  // Step 1: Brand
   brand: {
     name: string;
     tagline: string;
     heroPunchline: string;
-    logoDataUrl: string; // base64 preview
+    logoDataUrl: string;
   };
-
-  // Step 2: Theme
   theme: {
     primaryColor: string;
     accentColor: string;
     fontHeading: string;
     fontBody: string;
   };
-
-  // Step 3: Contact + Hours
   contact: {
     phone: string;
     email: string;
@@ -33,8 +27,6 @@ export type WizardData = {
     close: string;
     closed: boolean;
   }>;
-
-  // Step 4: Features
   features: {
     onlineOrdering: boolean;
     reservations: boolean;
@@ -42,8 +34,6 @@ export type WizardData = {
     reviews: boolean;
     newsletter: boolean;
   };
-
-  // Step 5: Payment accounts
   paymentAccounts: {
     jazzcash: {
       enabled: boolean;
@@ -61,21 +51,16 @@ export type WizardData = {
       enabled: boolean;
     };
   };
-
   whatsapp: {
     enabled: boolean;
     number: string;
   };
-
-  // Step 6: Supabase
   supabase: {
     url: string;
     anonKey: string;
     serviceRoleKey: string;
     verified: boolean;
   };
-
-  // Step 7: Currency + SEO
   currency: string;
   seo: {
     title: string;
@@ -109,8 +94,18 @@ const defaultData: WizardData = {
     newsletter: false,
   },
   paymentAccounts: {
-    jazzcash: { enabled: true, accountName: "", accountNumber: "", qrCodeDataUrl: "" },
-    easypaisa: { enabled: true, accountName: "", accountNumber: "", qrCodeDataUrl: "" },
+    jazzcash: {
+      enabled: true,
+      accountName: "",
+      accountNumber: "",
+      qrCodeDataUrl: "",
+    },
+    easypaisa: {
+      enabled: true,
+      accountName: "",
+      accountNumber: "",
+      qrCodeDataUrl: "",
+    },
     cod: { enabled: true },
   },
   whatsapp: { enabled: true, number: "" },
@@ -120,8 +115,9 @@ const defaultData: WizardData = {
 };
 
 type WizardStore = {
-  currentStep: number; // 1..7
+  currentStep: number;
   data: WizardData;
+  _hasHydrated: boolean;
 
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -133,6 +129,7 @@ type WizardStore = {
   ) => void;
 
   reset: () => void;
+  setHasHydrated: (v: boolean) => void;
 };
 
 const TOTAL_STEPS = 7;
@@ -142,6 +139,7 @@ export const useWizardStore = create<WizardStore>()(
     (set, get) => ({
       currentStep: 1,
       data: defaultData,
+      _hasHydrated: false,
 
       setStep: (step) => {
         const clamped = Math.max(1, Math.min(TOTAL_STEPS, step));
@@ -164,9 +162,14 @@ export const useWizardStore = create<WizardStore>()(
         })),
 
       reset: () => set({ currentStep: 1, data: defaultData }),
+
+      setHasHydrated: (v) => set({ _hasHydrated: v }),
     }),
     {
       name: "restaurant-builder-wizard",
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
