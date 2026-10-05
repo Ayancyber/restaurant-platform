@@ -216,7 +216,7 @@ Open http://localhost:3000 → your restaurant website is live!
 Your admin panel is at http://localhost:3000/admin
 
 **Login credentials were set during the wizard** and are stored in your
-Supabase project (auto-created when you ran the SQL). Check `.env.local`
+Supabase project (auto-created when you ran the SQL). Check \`.env.local\`
 for the email and password you chose.
 
 To log in:
