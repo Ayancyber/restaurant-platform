@@ -158,6 +158,16 @@ export function generateEnvFile(data: WizardData): string {
   lines.push("STRIPE_SECRET_KEY=");
   lines.push("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=");
 
+  if (data.supabase.adminEmail && data.supabase.adminPassword) {
+    lines.push("");
+    lines.push("# ==============================================");
+    lines.push("# ADMIN LOGIN (created automatically in your Supabase)");
+    lines.push("# ==============================================");
+    lines.push(`# Email:    ${data.supabase.adminEmail}`);
+    lines.push(`# Password: ${data.supabase.adminPassword}`);
+    lines.push("# Log in at /login on your deployed site.");
+  }
+
   return lines.join("\n");
 }
 
@@ -205,22 +215,17 @@ Open http://localhost:3000 → your restaurant website is live!
 
 Your admin panel is at http://localhost:3000/admin
 
-To log in, you need to create an admin user:
+**Login credentials were set during the wizard** and are stored in your
+Supabase project (auto-created when you ran the SQL). Check `.env.local`
+for the email and password you chose.
 
-1. Go to your Supabase project → Authentication → Users
-2. Click "Add user" → Create new user
-3. Enter your email and a strong password
-4. Check "Auto Confirm User"
-5. Copy the user UUID
-6. In Supabase SQL Editor, run:
+To log in:
+1. Go to http://localhost:3000/login
+2. Enter your admin email and password
+3. You'll be redirected to the admin dashboard
 
-\`\`\`sql
-update public.profiles
-set role = 'admin'
-where id = 'paste-your-user-uuid-here';
-\`\`\`
-
-Now log in at /login with those credentials.
+**Forgot your password?** Reset it in Supabase →
+Authentication → Users → find your user → Reset password.
 
 ## 📦 What's Included
 

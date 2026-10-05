@@ -2,7 +2,9 @@
 
 :root {
   --primary: #c2410c;
+  --primary-foreground: #ffffff;
   --accent: #facc15;
+  --accent-foreground: #0a0a0a;
   --radius: 0.5rem;
   --background: #ffffff;
   --foreground: #0a0a0a;
@@ -14,7 +16,7 @@
   --popover: #ffffff;
   --popover-foreground: #0a0a0a;
   --input: #e4e4e7;
-  --ring: #c2410c;
+  --ring: var(--primary);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,7 +31,7 @@
     --popover: #18181b;
     --popover-foreground: #fafafa;
     --input: #27272a;
-    --ring: #c2410c;
+    --ring: var(--primary);
   }
 }
 

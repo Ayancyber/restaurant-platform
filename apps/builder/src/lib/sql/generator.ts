@@ -24,6 +24,7 @@ export function generateSQL(data: WizardData): string {
   sections.push(profilesAndTriggers());
   sections.push(rlsPolicies(features));
   sections.push(seedData(data));
+  sections.push(adminUser(data));
 
   return sections.join("\n\n");
 }
@@ -448,6 +449,121 @@ on conflict do nothing;`);
 /**
  * Returns a lightweight table count for "Test Connection" verification.
  */
+function adminUser(data: WizardData): string {
+  const email = data.supabase.adminEmail?.trim();
+  const password = data.supabase.adminPassword?.trim();
+
+  if (!email || !password) {
+    return `-- =====================================================================
+-- ADMIN USER
+-- =====================================================================
+-- No admin email/password was provided in the builder.
+-- To create an admin manually:
+--   1. Go to Supabase → Authentication → Users
+--   2. Click "Add user" → Create new user
+--   3. Enter your email + password, check "Auto Confirm User"
+--   4. Copy the new user's UUID
+--   5. Run this SQL (replace the UUID):
+--      update public.profiles set role = 'admin' where id = 'PASTE-UUID-HERE';
+-- =====================================================================`;
+  }
+
+  const escEmail = email.replace(/'/g, "''");
+  const escPass = password.replace(/'/g, "''");
+
+  return `-- =====================================================================
+-- ADMIN USER (auto-created)
+-- =====================================================================
+-- Email:    ${escEmail}
+-- Password: (chosen during wizard — log in with it at /login)
+
+-- Enable pgcrypto for password hashing
+create extension if not exists pgcrypto;
+
+do $$
+declare
+  new_user_id uuid;
+  existing_user_id uuid;
+  user_already_exists boolean := false;
+begin
+  -- Check if user already exists
+  select id into existing_user_id
+  from auth.users
+  where email = '${escEmail}'
+  limit 1;
+
+  if existing_user_id is not null then
+    user_already_exists := true;
+    new_user_id := existing_user_id;
+  else
+    -- Insert new user into auth.users
+    new_user_id := gen_random_uuid();
+
+    insert into auth.users (
+      instance_id,
+      id,
+      aud,
+      role,
+      email,
+      encrypted_password,
+      email_confirmed_at,
+      raw_app_meta_data,
+      raw_user_meta_data,
+      created_at,
+      updated_at,
+      confirmation_token,
+      email_change,
+      email_change_token_new,
+      recovery_token
+    ) values (
+      '00000000-0000-0000-0000-000000000000',
+      new_user_id,
+      'authenticated',
+      'authenticated',
+      '${escEmail}',
+      crypt('${escPass}', gen_salt('bf')),
+      now(),
+      '{"provider":"email","providers":["email"]}'::jsonb,
+      '{}'::jsonb,
+      now(),
+      now(),
+      '',
+      '',
+      '',
+      ''
+    );
+
+    -- Required: insert into auth.identities so login works
+    insert into auth.identities (
+      id,
+      user_id,
+      identity_data,
+      provider,
+      provider_id,
+      last_sign_in_at,
+      created_at,
+      updated_at
+    ) values (
+      gen_random_uuid(),
+      new_user_id,
+      jsonb_build_object('sub', new_user_id::text, 'email', '${escEmail}'),
+      'email',
+      '${escEmail}',
+      now(),
+      now(),
+      now()
+    );
+  end if;
+
+  -- Ensure profile exists with admin role
+  insert into public.profiles (id, email, role)
+  values (new_user_id, '${escEmail}', 'admin')
+  on conflict (id) do update set role = 'admin';
+
+  raise notice 'Admin user ready: %', '${escEmail}';
+end $$;`;
+}
+
 export const EXPECTED_TABLES = [
   "menu_categories",
   "menu_items",

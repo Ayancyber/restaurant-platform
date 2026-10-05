@@ -36,11 +36,15 @@ export function SupabaseStep() {
   const [sqlCopied, setSqlCopied] = useState(false);
   const [sqlExpanded, setSqlExpanded] = useState(false);
   const [showAnonKey, setShowAnonKey] = useState(false);
+  const [showServiceRoleKey, setShowServiceRoleKey] = useState(false);
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [verify, setVerify] = useState<VerifyState>({ status: "idle" });
 
   const [url, setUrl] = useState("");
   const [anonKey, setAnonKey] = useState("");
   const [serviceRoleKey, setServiceRoleKey] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
 
   useEffect(() => setMounted(true), []);
 
@@ -49,10 +53,22 @@ export function SupabaseStep() {
     setUrl(data.supabase.url);
     setAnonKey(data.supabase.anonKey);
     setServiceRoleKey(data.supabase.serviceRoleKey);
+    setAdminEmail(data.supabase.adminEmail || "");
+    setAdminPassword(data.supabase.adminPassword || "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [_hasHydrated]);
 
-  // Regenerate SQL when features change
+  // Validation
+  const urlValid = url.startsWith("https://") && url.includes(".supabase.co");
+  const anonKeyValid = anonKey.length > 40;
+  const serviceRoleValid = serviceRoleKey.length > 40;
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail);
+  const passwordValid = adminPassword.length >= 8;
+
+  const allValid =
+    urlValid && anonKeyValid && serviceRoleValid && emailValid && passwordValid;
+
+  // SQL regeneration reacts to admin fields
   const sql = useMemo(() => generateSQL(data), [data]);
 
   function persistSupabase(patch: Partial<typeof data.supabase>) {
@@ -74,6 +90,16 @@ export function SupabaseStep() {
   function handleServiceRoleKeyChange(v: string) {
     setServiceRoleKey(v);
     persistSupabase({ serviceRoleKey: v });
+  }
+
+  function handleAdminEmailChange(v: string) {
+    setAdminEmail(v);
+    persistSupabase({ adminEmail: v });
+  }
+
+  function handleAdminPasswordChange(v: string) {
+    setAdminPassword(v);
+    persistSupabase({ adminPassword: v });
   }
 
   async function handleCopySQL() {
@@ -131,7 +157,7 @@ export function SupabaseStep() {
 
   return (
     <div className="space-y-6">
-      {/* Step 1: Create Supabase project */}
+      {/* ============ STEP 1: Create Supabase project ============ */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -169,21 +195,227 @@ export function SupabaseStep() {
         </CardContent>
       </Card>
 
-      {/* Step 2: Run SQL */}
+      {/* ============ STEP 2: Fill credentials ============ */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <span className="h-6 w-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
               2
             </span>
+            Fill in your Supabase details
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            In Supabase, go to <span className="font-medium text-foreground">Settings → API</span>.
+            Copy the three values below.
+          </p>
+
+          {/* Project URL */}
+          <div className="space-y-2">
+            <Label htmlFor="supabase-url">
+              Project URL <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="supabase-url"
+              value={url}
+              onChange={(e) => handleUrlChange(e.target.value)}
+              placeholder="https://abcdefgh.supabase.co"
+              className={`font-mono text-sm ${
+                url && !urlValid ? "border-destructive" : ""
+              }`}
+            />
+            {url && !urlValid && (
+              <p className="text-xs text-destructive">
+                Must be a valid Supabase URL (https://...supabase.co)
+              </p>
+            )}
+            {!url && (
+              <p className="text-xs text-muted-foreground">
+                Starts with <code>https://</code>
+              </p>
+            )}
+          </div>
+
+          {/* Anon Key */}
+          <div className="space-y-2">
+            <Label htmlFor="anon-key">
+              Anon Public Key <span className="text-destructive">*</span>
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="anon-key"
+                value={anonKey}
+                onChange={(e) => handleAnonKeyChange(e.target.value)}
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                type={showAnonKey ? "text" : "password"}
+                className={`font-mono text-xs flex-1 ${
+                  anonKey && !anonKeyValid ? "border-destructive" : ""
+                }`}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setShowAnonKey(!showAnonKey)}
+              >
+                {showAnonKey ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {anonKey && !anonKeyValid && (
+              <p className="text-xs text-destructive">
+                Anon key looks too short — did you copy the full key?
+              </p>
+            )}
+            {!anonKey && (
+              <p className="text-xs text-muted-foreground">
+                The <span className="font-medium">anon</span> key — safe for the
+                browser.
+              </p>
+            )}
+          </div>
+
+          {/* Service Role Key */}
+          <div className="space-y-2">
+            <Label htmlFor="service-key">
+              Service Role Key <span className="text-destructive">*</span>
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="service-key"
+                value={serviceRoleKey}
+                onChange={(e) => handleServiceRoleKeyChange(e.target.value)}
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                type={showServiceRoleKey ? "text" : "password"}
+                className={`font-mono text-xs flex-1 ${
+                  serviceRoleKey && !serviceRoleValid ? "border-destructive" : ""
+                }`}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setShowServiceRoleKey(!showServiceRoleKey)}
+              >
+                {showServiceRoleKey ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {serviceRoleKey && !serviceRoleValid && (
+              <p className="text-xs text-destructive">
+                Service role key looks too short.
+              </p>
+            )}
+            {!serviceRoleKey && (
+              <p className="text-xs text-muted-foreground">
+                Needed for admin panel features. Keep secret — server only.
+              </p>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Admin Account */}
+          <div className="space-y-1">
+            <p className="text-sm font-medium">
+              Admin Account <span className="text-destructive">*</span>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              We&apos;ll create this admin user in your Supabase automatically.
+              Use these credentials to log into your admin panel.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="admin-email">
+              Admin Email <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="admin-email"
+              value={adminEmail}
+              onChange={(e) => handleAdminEmailChange(e.target.value)}
+              placeholder="admin@yourrestaurant.com"
+              type="email"
+              autoComplete="off"
+              className={adminEmail && !emailValid ? "border-destructive" : ""}
+            />
+            {adminEmail && !emailValid && (
+              <p className="text-xs text-destructive">
+                Please enter a valid email address.
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="admin-password">
+              Admin Password <span className="text-destructive">*</span>
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="admin-password"
+                value={adminPassword}
+                onChange={(e) => handleAdminPasswordChange(e.target.value)}
+                placeholder="At least 8 characters"
+                type={showAdminPassword ? "text" : "password"}
+                autoComplete="off"
+                className={`flex-1 ${
+                  adminPassword && !passwordValid ? "border-destructive" : ""
+                }`}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setShowAdminPassword(!showAdminPassword)}
+              >
+                {showAdminPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            {adminPassword && !passwordValid && (
+              <p className="text-xs text-destructive">
+                Password must be at least 8 characters.
+              </p>
+            )}
+          </div>
+
+          {/* Not-all-valid hint */}
+          {!allValid && (
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border">
+              <AlertCircle className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+              <p className="text-xs text-muted-foreground">
+                Fill in all 5 fields above (URL, anon key, service role key,
+                admin email, admin password) to unlock the SQL below.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ============ STEP 3: Copy SQL ============ */}
+      <Card className={!allValid ? "opacity-50 pointer-events-none" : ""}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span className="h-6 w-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+              3
+            </span>
             Run the setup SQL
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            We generated custom SQL based on the features you selected. It
-            creates all the tables, security rules, and seed data your site
-            needs.
+            Custom SQL generated from your details. Creates all tables,
+            security rules, seed data, and your admin user.
           </p>
 
           <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
@@ -193,13 +425,13 @@ export function SupabaseStep() {
                 Important: Choose &quot;Run without RLS&quot; in Supabase
               </p>
               <p className="text-muted-foreground mt-0.5">
-                When you paste this SQL and click Run, Supabase may show a
-                dialog saying &quot;Potential issues detected&quot;. Choose{" "}
+                If a dialog appears saying &quot;Potential issues detected&quot;,
+                choose{" "}
                 <span className="font-medium text-foreground">
                   Run without RLS
                 </span>{" "}
-                — NOT &quot;Run and enable RLS&quot;. This SQL already defines
-                its own security policies.
+                — NOT &quot;Run and enable RLS&quot;. This SQL defines its own
+                security policies.
               </p>
             </div>
           </div>
@@ -254,10 +486,10 @@ export function SupabaseStep() {
           </Button>
 
           <div className="text-sm text-muted-foreground">
-            Now paste it in Supabase:
+            Then in Supabase:
             <ol className="list-decimal list-inside mt-1.5 space-y-1">
               <li>
-                In Supabase, click{" "}
+                Click{" "}
                 <span className="font-medium text-foreground">SQL Editor</span>{" "}
                 (left sidebar)
               </li>
@@ -268,110 +500,18 @@ export function SupabaseStep() {
                 <span className="font-medium text-foreground">Run</span> (or
                 Ctrl+Enter)
               </li>
-              <li>You should see "Success. No rows returned"</li>
+              <li>If prompted, choose &quot;Run without RLS&quot;</li>
             </ol>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Step 3: Get keys + paste */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="h-6 w-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
-              3
-            </span>
-            Paste your Supabase keys
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-sm text-muted-foreground">
-            In Supabase, go to{" "}
-            <span className="font-medium text-foreground">
-              Settings → API
-            </span>
-            . You'll see two keys on that page.
-          </div>
-
-          {/* Project URL */}
-          <div className="space-y-2">
-            <Label htmlFor="supabase-url">Project URL</Label>
-            <Input
-              id="supabase-url"
-              value={url}
-              onChange={(e) => handleUrlChange(e.target.value)}
-              placeholder="https://abcdefgh.supabase.co"
-              className="font-mono text-sm"
-            />
-            <p className="text-xs text-muted-foreground">
-              Starts with <code>https://</code> — the "URL" field on the API page
-            </p>
-          </div>
-
-          {/* Anon Key */}
-          <div className="space-y-2">
-            <Label htmlFor="anon-key">Anon Public Key</Label>
-            <div className="flex gap-2">
-              <Input
-                id="anon-key"
-                value={anonKey}
-                onChange={(e) => handleAnonKeyChange(e.target.value)}
-                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                type={showAnonKey ? "text" : "password"}
-                className="font-mono text-xs flex-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => setShowAnonKey(!showAnonKey)}
-              >
-                {showAnonKey ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              The <span className="font-medium">anon</span> key — safe to use
-              in the browser. Do NOT paste the <code>service_role</code> key
-              here.
-            </p>
-          </div>
-
-          {/* Service Role Key (optional) */}
-          <div className="space-y-2">
-            <Label htmlFor="service-key">
-              Service Role Key{" "}
-              <span className="text-muted-foreground font-normal">
-                (optional — for admin features)
-              </span>
-            </Label>
-            <Input
-              id="service-key"
-              value={serviceRoleKey}
-              onChange={(e) => handleServiceRoleKeyChange(e.target.value)}
-              placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-              type="password"
-              className="font-mono text-xs"
-            />
-            <p className="text-xs text-muted-foreground">
-              The <code>service_role</code> key. Needed for admin actions.
-              Keep it secret — never ship to the browser.
-            </p>
           </div>
 
           <Separator />
 
-          {/* Verify button */}
+          {/* Test Connection */}
           <div className="space-y-3">
             <Button
               type="button"
               onClick={handleVerify}
-              disabled={
-                verify.status === "verifying" || !url || !anonKey
-              }
+              disabled={verify.status === "verifying" || !url || !anonKey}
               size="lg"
               className="w-full gap-2"
             >

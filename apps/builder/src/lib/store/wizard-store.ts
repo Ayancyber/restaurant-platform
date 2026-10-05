@@ -58,6 +58,8 @@ export type WizardData = {
     anonKey: string;
     serviceRoleKey: string;
     verified: boolean;
+    adminEmail: string;
+    adminPassword: string;
   };
   currency: string;
   seo: {
@@ -105,7 +107,14 @@ const defaultData: WizardData = {
     cod: { enabled: true },
   },
   whatsapp: { enabled: true, number: "" },
-  supabase: { url: "", anonKey: "", serviceRoleKey: "", verified: false },
+  supabase: {
+    url: "",
+    anonKey: "",
+    serviceRoleKey: "",
+    verified: false,
+    adminEmail: "",
+    adminPassword: "",
+  },
   currency: "PKR",
   seo: { title: "", description: "" },
 };

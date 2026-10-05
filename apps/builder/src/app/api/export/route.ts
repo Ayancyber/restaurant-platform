@@ -62,6 +62,8 @@ const dataSchema = z.object({
     anonKey: z.string(),
     serviceRoleKey: z.string(),
     verified: z.boolean(),
+    adminEmail: z.string().optional().default(""),
+    adminPassword: z.string().optional().default(""),
   }),
   currency: z.string(),
   seo: z.object({
