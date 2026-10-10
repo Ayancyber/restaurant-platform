@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MapPin, Phone, Mail, Share2 } from "lucide-react";
+import { Reveal } from "@/components/site/reveal";
 import type { RestaurantConfig } from "@/config";
 
 export function Footer({ settings }: { settings: RestaurantConfig }) {
@@ -8,7 +9,7 @@ export function Footer({ settings }: { settings: RestaurantConfig }) {
   return (
     <footer className="border-t bg-muted/30">
       <div className="container mx-auto grid gap-10 px-4 py-12 md:grid-cols-4">
-        <div className="space-y-3">
+        <Reveal className="space-y-3">
           <h3 className="font-heading text-xl font-semibold">{brand.name}</h3>
           <p className="text-sm text-muted-foreground">{brand.tagline}</p>
           {footer.showSocial && (
@@ -37,9 +38,9 @@ export function Footer({ settings }: { settings: RestaurantConfig }) {
               )}
             </div>
           )}
-        </div>
+        </Reveal>
 
-        <div className="space-y-3">
+        <Reveal delay={100} className="space-y-3">
           <h4 className="font-medium">{footer.contactHeading}</h4>
           <div className="space-y-2 text-sm text-muted-foreground">
             <div className="flex items-start gap-2">
@@ -59,9 +60,9 @@ export function Footer({ settings }: { settings: RestaurantConfig }) {
               </a>
             </div>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="space-y-3">
+        <Reveal delay={200} className="space-y-3">
           <h4 className="font-medium">{footer.hoursHeading}</h4>
           <ul className="space-y-1 text-sm text-muted-foreground">
             {hours.slice(0, footer.hoursToShow).map((h) => (
@@ -71,9 +72,9 @@ export function Footer({ settings }: { settings: RestaurantConfig }) {
               </li>
             ))}
           </ul>
-        </div>
+        </Reveal>
 
-        <div className="space-y-3">
+        <Reveal delay={300} className="space-y-3">
           <h4 className="font-medium">{footer.exploreHeading}</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {nav.links
@@ -86,7 +87,7 @@ export function Footer({ settings }: { settings: RestaurantConfig }) {
                 </li>
               ))}
           </ul>
-        </div>
+        </Reveal>
       </div>
 
       <div className="border-t">

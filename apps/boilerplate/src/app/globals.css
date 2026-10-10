@@ -72,3 +72,193 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading), Georgia, serif;
 }
+
+/* =============================================
+   Animations
+   ============================================= */
+
+/* --- Entrance keyframes --- */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoom-in-soft {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- Ambient loops --- */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes gentle-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes ping-slow {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* --- Animation utility classes --- */
+@utility animate-fade-in-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+}
+
+@utility animate-fade-in {
+  animation: fade-in 0.6s ease-out both;
+}
+
+@utility animate-zoom-in-soft {
+  animation: zoom-in-soft 0.7s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+}
+
+@utility animate-slide-in-left {
+  animation: slide-in-left 0.7s ease-out both;
+}
+
+@utility animate-slide-in-right {
+  animation: slide-in-right 0.7s ease-out both;
+}
+
+@utility animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@utility animate-gentle-pulse {
+  animation: gentle-pulse 2.5s ease-in-out infinite;
+}
+
+@utility animate-ping-slow {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@utility animate-bounce-soft {
+  animation: bounce-soft 1.4s ease-in-out infinite;
+}
+
+/* --- Delay helpers (for entrance staggers) --- */
+@utility delay-75 {
+  transition-delay: 75ms;
+  animation-delay: 75ms;
+}
+
+@utility delay-150 {
+  transition-delay: 150ms;
+  animation-delay: 150ms;
+}
+
+@utility delay-300 {
+  transition-delay: 300ms;
+  animation-delay: 300ms;
+}
+
+@utility delay-500 {
+  transition-delay: 500ms;
+  animation-delay: 500ms;
+}
+
+/* --- Page transition (applied per-route in public layout) --- */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+  opacity: 1;
+  transform: translateY(0);
+}
+}
+
+.page-enter {
+  animation: page-enter 0.5s ease-out both;
+}
+
+/* --- Respect reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .page-enter {
+    animation: none;
+  }
+}

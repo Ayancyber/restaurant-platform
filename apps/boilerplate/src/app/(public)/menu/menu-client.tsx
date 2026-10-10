@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Plus, Search } from "lucide-react";
+import { Check, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useCart } from "@/hooks/use-cart";
+import { Reveal } from "@/components/site/reveal";
 
 type Category = {
   id: string;
@@ -40,6 +41,7 @@ export function MenuClient({
 }) {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [addedId, setAddedId] = useState<string | null>(null);
   const addItem = useCart((s) => s.addItem);
   const openCart = useCart((s) => s.openCart);
 
@@ -67,13 +69,16 @@ export function MenuClient({
       image_url: item.image_url,
     });
     toast.success(`${item.name} added to cart`);
+    // Flash "Added ✓" on the button
+    setAddedId(item.id);
+    window.setTimeout(() => setAddedId(null), 1200);
     // Optional: open cart drawer automatically
     // openCart();
   };
 
   return (
     <>
-      <div className="mx-auto mb-8 max-w-md relative">
+      <div className="mx-auto mb-8 max-w-md relative animate-fade-in-up">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search dishes..."
@@ -86,7 +91,7 @@ export function MenuClient({
       <Tabs
         value={activeCategory}
         onValueChange={setActiveCategory}
-        className="mb-10"
+        className="mb-10 animate-fade-in-up delay-150"
       >
         <TabsList className="w-full justify-start overflow-x-auto flex-nowrap h-auto pb-1">
           <TabsTrigger value="all" className="whitespace-nowrap">All</TabsTrigger>
@@ -105,17 +110,21 @@ export function MenuClient({
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((item) => (
-            <Card
+          {filtered.map((item, i) => (
+            <Reveal
               key={item.id}
-              className="overflow-hidden flex flex-col transition-shadow hover:shadow-lg"
+              variant="zoom-in"
+              delay={Math.min(i, 8) * 70}
+              className="h-full"
             >
-              <div className="aspect-[4/3] bg-muted flex items-center justify-center text-muted-foreground">
+            <Card className="group h-full overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+              <div className="aspect-[4/3] overflow-hidden bg-muted flex items-center justify-center text-muted-foreground">
                 {item.image_url ? (
                   <img
                     src={item.image_url}
                     alt={item.name}
-                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                 ) : (
                   <span className="text-sm">No image</span>
@@ -145,14 +154,28 @@ export function MenuClient({
                 )}
 
                 <Button
-                  className="mt-4 w-full gap-2"
+                  className={
+                    addedId === item.id
+                      ? "mt-4 w-full gap-2 bg-green-600 hover:bg-green-600 transition-colors"
+                      : "mt-4 w-full gap-2"
+                  }
                   onClick={() => handleAdd(item)}
                 >
-                  <Plus className="h-4 w-4" />
-                  Add to Cart
+                  {addedId === item.id ? (
+                    <>
+                      <Check className="h-4 w-4 animate-bounce-soft" />
+                      Added!
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+                      Add to Cart
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
+            </Reveal>
           ))}
         </div>
       )}

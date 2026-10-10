@@ -179,7 +179,7 @@ export function OrdersAdminClient({
       </header>
 
       <Tabs value={filter} onValueChange={(v) => setFilter(v as any)}>
-        <TabsList className="flex-wrap h-auto">
+        <TabsList className="flex-wrap h-auto bg-transparent">
           <TabsTrigger value="active">Active ({activeCount})</TabsTrigger>
           <TabsTrigger value="pending">Pending</TabsTrigger>
           <TabsTrigger value="preparing">Preparing</TabsTrigger>
@@ -191,13 +191,13 @@ export function OrdersAdminClient({
       </Tabs>
 
       {filtered.length === 0 ? (
-        <Card>
+        <Card className="mt-[72px]">
           <CardContent className="py-16 text-center text-muted-foreground">
             No orders in this view.
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 mt-[72px]">
           {filtered.map((order) => {
             const config = statusConfig[order.status];
             const Icon = config.icon;

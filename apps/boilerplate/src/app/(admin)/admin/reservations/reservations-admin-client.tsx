@@ -150,7 +150,7 @@ export function ReservationsAdminClient({
       </header>
 
       <Tabs value={filter} onValueChange={(v) => setFilter(v as any)}>
-        <TabsList className="flex-wrap h-auto">
+        <TabsList className="flex-wrap h-auto bg-transparent">
           <TabsTrigger value="upcoming">Upcoming ({upcomingCount})</TabsTrigger>
           <TabsTrigger value="pending">Pending ({pendingCount})</TabsTrigger>
           <TabsTrigger value="confirmed">Confirmed</TabsTrigger>
@@ -162,13 +162,13 @@ export function ReservationsAdminClient({
       </Tabs>
 
       {filtered.length === 0 ? (
-        <Card>
+        <Card className="mt-[72px]">
           <CardContent className="py-16 text-center text-muted-foreground">
             No reservations in this view.
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 mt-[72px]">
           {filtered.map((reservation) => {
             const config = statusConfig[reservation.status];
             const Icon = config.icon;

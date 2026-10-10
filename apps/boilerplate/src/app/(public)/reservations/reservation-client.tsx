@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Reveal } from "@/components/site/reveal";
 import type { RestaurantConfig } from "@/config";
 
 export function ReservationClient({ settings }: { settings: RestaurantConfig }) {
@@ -81,10 +82,10 @@ export function ReservationClient({ settings }: { settings: RestaurantConfig }) 
       <div className="container mx-auto max-w-2xl px-4 py-20">
         <Card>
           <CardContent className="p-10 text-center">
-            <div className="mx-auto w-fit rounded-full bg-green-500/10 p-4">
-              <CheckCircle2 className="h-12 w-12 text-green-600" />
+            <div className="mx-auto w-fit rounded-full bg-green-500/10 p-4 animate-zoom-in-soft">
+              <CheckCircle2 className="h-12 w-12 text-green-600 animate-bounce-soft" />
             </div>
-            <h1 className="font-heading text-3xl font-bold mt-6">
+            <h1 className="font-heading text-3xl font-bold mt-6 animate-fade-in-up delay-150">
               Reservation Requested!
             </h1>
             <p className="mt-3 text-muted-foreground">
@@ -116,7 +117,7 @@ export function ReservationClient({ settings }: { settings: RestaurantConfig }) 
 
   return (
     <div className="container mx-auto max-w-5xl px-4 py-16">
-      <header className="mb-12 text-center">
+      <Reveal as="header" className="mb-12 text-center">
         <h1 className="font-heading text-4xl font-bold sm:text-5xl">
           Reserve a Table
         </h1>
@@ -124,10 +125,11 @@ export function ReservationClient({ settings }: { settings: RestaurantConfig }) 
           Book your spot at {brand.name} — we'll save you the best seat in the
           house.
         </p>
-      </header>
+      </Reveal>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
-        <Card>
+        <Reveal variant="fade-right">
+        <Card className="transition-shadow hover:shadow-lg">
           <CardHeader>
             <CardTitle>Reservation Details</CardTitle>
           </CardHeader>
@@ -221,7 +223,7 @@ export function ReservationClient({ settings }: { settings: RestaurantConfig }) 
               <Button
                 type="submit"
                 size="lg"
-                className="w-full gap-2"
+                className="w-full gap-2 transition-transform active:scale-[0.98]"
                 disabled={submitting}
               >
                 {submitting ? (
@@ -244,8 +246,10 @@ export function ReservationClient({ settings }: { settings: RestaurantConfig }) 
             </form>
           </CardContent>
         </Card>
+        </Reveal>
 
         <div className="space-y-6">
+          <Reveal variant="fade-left">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -266,7 +270,9 @@ export function ReservationClient({ settings }: { settings: RestaurantConfig }) 
               </ul>
             </CardContent>
           </Card>
+          </Reveal>
 
+          <Reveal variant="fade-left" delay={120}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -285,7 +291,9 @@ export function ReservationClient({ settings }: { settings: RestaurantConfig }) 
               </a>
             </CardContent>
           </Card>
+          </Reveal>
 
+          <Reveal variant="fade-left" delay={240}>
           <Card className="bg-primary/5 border-primary/20">
             <CardContent className="p-5 text-sm">
               <p className="font-medium flex items-center gap-2">
@@ -303,6 +311,7 @@ export function ReservationClient({ settings }: { settings: RestaurantConfig }) 
               </p>
             </CardContent>
           </Card>
+          </Reveal>
         </div>
       </div>
     </div>

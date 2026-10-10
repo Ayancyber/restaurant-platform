@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
+import { Reveal } from "@/components/site/reveal";
 import { MenuClient } from "./menu-client";
 
 export const dynamic = "force-dynamic";
@@ -22,14 +23,14 @@ export default async function MenuPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <header className="mb-12 text-center">
+      <Reveal as="header" className="mb-12 text-center">
         <h1 className="font-heading text-4xl font-bold sm:text-5xl">
           Our Menu
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">
           {settings.brand.tagline}
         </p>
-      </header>
+      </Reveal>
 
       <MenuClient
         categories={categories ?? []}

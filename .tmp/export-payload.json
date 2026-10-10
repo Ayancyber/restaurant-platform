@@ -1,0 +1,24 @@
+{
+  "brand": { "name": "Deploy Test Restaurant", "tagline": "Test tagline", "heroPunchline": "Test punchline", "logoDataUrl": "" },
+  "theme": { "primaryColor": "#c2410c", "accentColor": "#facc15", "fontHeading": "Playfair Display", "fontBody": "Inter" },
+  "contact": { "phone": "+92 300 1234567", "email": "test@example.com", "address": "Lahore, Pakistan" },
+  "hours": [
+    { "day": "Monday", "open": "11:00", "close": "22:00", "closed": false },
+    { "day": "Tuesday", "open": "11:00", "close": "22:00", "closed": false },
+    { "day": "Wednesday", "open": "11:00", "close": "22:00", "closed": false },
+    { "day": "Thursday", "open": "11:00", "close": "22:00", "closed": false },
+    { "day": "Friday", "open": "11:00", "close": "23:30", "closed": false },
+    { "day": "Saturday", "open": "10:00", "close": "23:30", "closed": false },
+    { "day": "Sunday", "open": "10:00", "close": "21:00", "closed": false }
+  ],
+  "features": { "onlineOrdering": true, "reservations": true, "gallery": true },
+  "paymentAccounts": {
+    "jazzcash": { "enabled": false, "accountName": "", "accountNumber": "", "qrCodeDataUrl": "" },
+    "easypaisa": { "enabled": false, "accountName": "", "accountNumber": "", "qrCodeDataUrl": "" },
+    "cod": { "enabled": true }
+  },
+  "whatsapp": { "enabled": false, "number": "" },
+  "supabase": { "url": "https://example.supabase.co", "anonKey": "test-anon-key", "serviceRoleKey": "", "verified": false },
+  "currency": "PKR",
+  "seo": { "title": "Deploy Test Restaurant", "description": "Test description" }
+}

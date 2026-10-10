@@ -65,7 +65,7 @@ export function CartDrawer({ currency }: { currency: string }) {
                 {items.map((item) => (
                   <li
                     key={item.id}
-                    className="flex gap-4 border-b pb-4 last:border-0"
+                    className="flex gap-4 border-b pb-4 last:border-0 animate-fade-in-up"
                   >
                     <div className="h-20 w-20 shrink-0 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground overflow-hidden">
                       {item.image_url ? (

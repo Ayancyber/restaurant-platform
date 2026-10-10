@@ -45,9 +45,10 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="group relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
+              <span className="absolute left-0 -bottom-1 h-0.5 w-0 rounded-full bg-primary transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
           <Link
@@ -76,13 +77,16 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
           <Button
             variant="default"
             size="sm"
-            className="gap-2 relative"
+            className="gap-2 relative transition-transform active:scale-95"
             onClick={openCart}
           >
             <ShoppingCart className="h-4 w-4" />
             <span className="hidden sm:inline">{nav.ctaLabel}</span>
             {mounted && itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-medium">
+              <span
+                key={itemCount}
+                className="absolute -top-2 -right-2 h-5 min-w-5 px-1 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-medium animate-zoom-in-soft"
+              >
                 {itemCount}
               </span>
             )}
