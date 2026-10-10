@@ -128,7 +128,14 @@ Questions? See README.md for full documentation.
 `
   );
 
-  // 8. Handle logo if present (base64 → file) + use as favicon
+  // 8. Handle the uploaded logo — write it in TWO places:
+  //    a) public/logo.{ext}   → used by navbar (<img src="/logo.*">)
+  //    b) src/app/icon.png    → Next.js auto-serves as favicon
+  //
+  //    The favicon is always named .png because browsers parse .ico
+  //    files with a strict ICO-format parser; a PNG inside a .ico file
+  //    gets silently rejected. A .png file always works regardless of
+  //    the source format.
   if (data.brand.logoDataUrl && data.brand.logoDataUrl.startsWith("data:")) {
     const match = data.brand.logoDataUrl.match(
       /^data:image\/(\w+);base64,(.+)$/
@@ -138,24 +145,12 @@ Questions? See README.md for full documentation.
       const ext = rawExt === "jpeg" ? "jpg" : rawExt;
       const buffer = Buffer.from(match[2], "base64");
 
-      // Write the logo file (used by navbar)
+      // (a) navbar logo — keep the source format
       zip.file(`public/logo.${ext}`, buffer);
 
-      // Also write it as favicon so the browser tab shows the logo.
-      // We use .ico as the filename for maximum browser compatibility,
-      // but the actual bytes are PNG/JPG — browsers sniff the content.
-      zip.file(`public/favicon.ico`, buffer);
+      // (b) favicon — always PNG-extension
+      zip.file("src/app/icon.png", buffer);
     }
-  } else {
-    // No logo uploaded — ensure a default favicon.ico exists so the
-    // layout metadata doesn't 404.
-    zip.file(
-      "public/favicon.ico",
-      Buffer.from(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
-        "base64"
-      )
-    );
   }
 
   // 10. Generate the ZIP as a Buffer
