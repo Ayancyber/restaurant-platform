@@ -6,13 +6,28 @@ import type { WizardData } from "@/lib/store/wizard-store";
  */
 export function buildRestaurantConfig(data: WizardData) {
   return {
-    brand: {
-      name: data.brand.name || "My Restaurant",
-      tagline: data.brand.tagline || "",
-      heroPunchline: data.brand.heroPunchline || "",
-      logoUrl: data.brand.logoDataUrl || "/logo.svg",
-      faviconUrl: data.brand.logoDataUrl || "/favicon.ico",
-    },
+    brand: (() => {
+      // Detect the logo extension from the data URL, so we can write
+      // a real file path instead of an inline base64 string.
+      let logoPath = "/logo.svg";
+      if (
+        data.brand.logoDataUrl &&
+        data.brand.logoDataUrl.startsWith("data:")
+      ) {
+        const m = data.brand.logoDataUrl.match(
+          /^data:image\/(\w+);base64,/
+        );
+        const ext = m && m[1] === "jpeg" ? "jpg" : m ? m[1] : "png";
+        logoPath = `/logo.${ext}`;
+      }
+      return {
+        name: data.brand.name || "My Restaurant",
+        tagline: data.brand.tagline || "",
+        heroPunchline: data.brand.heroPunchline || "",
+        logoUrl: logoPath,
+        faviconUrl: "/favicon.ico",
+      };
+    })(),
     theme: {
       primaryColor: data.theme.primaryColor,
       accentColor: data.theme.accentColor,

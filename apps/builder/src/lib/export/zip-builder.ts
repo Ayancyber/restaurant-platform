@@ -128,22 +128,35 @@ Questions? See README.md for full documentation.
 `
   );
 
-  // 8. Handle logo if present (base64 → file)
+  // 8. Handle logo if present (base64 → file) + use as favicon
   if (data.brand.logoDataUrl && data.brand.logoDataUrl.startsWith("data:")) {
     const match = data.brand.logoDataUrl.match(
       /^data:image\/(\w+);base64,(.+)$/
     );
     if (match) {
-      const ext = match[1] === "jpeg" ? "jpg" : match[1];
+      const rawExt = match[1].toLowerCase();
+      const ext = rawExt === "jpeg" ? "jpg" : rawExt;
       const buffer = Buffer.from(match[2], "base64");
-      zip.file(`public/logo.${ext}`, buffer);
-    }
-  }
 
-  // 9. Generate favicon from logo (or fallback) — Option A
-  // If user uploaded a logo, use it as favicon too
-  // The actual favicon conversion happens in the browser (client)
-  // Here we just make sure the placeholder exists
+      // Write the logo file (used by navbar)
+      zip.file(`public/logo.${ext}`, buffer);
+
+      // Also write it as favicon so the browser tab shows the logo.
+      // We use .ico as the filename for maximum browser compatibility,
+      // but the actual bytes are PNG/JPG — browsers sniff the content.
+      zip.file(`public/favicon.ico`, buffer);
+    }
+  } else {
+    // No logo uploaded — ensure a default favicon.ico exists so the
+    // layout metadata doesn't 404.
+    zip.file(
+      "public/favicon.ico",
+      Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
+        "base64"
+      )
+    );
+  }
 
   // 10. Generate the ZIP as a Buffer
   const arrayBuffer = await zip.generateAsync({

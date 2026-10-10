@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   description: restaurantConfig.seo.description,
   keywords: restaurantConfig.seo.keywords,
   icons: {
-    icon: restaurantConfig.brand.faviconUrl || "/favicon.ico",
-    shortcut: restaurantConfig.brand.faviconUrl || "/favicon.ico",
-    apple: restaurantConfig.brand.faviconUrl || "/favicon.ico",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
