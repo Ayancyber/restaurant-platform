@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { orderSchema } from "@/lib/validators";
 
+// Delivery fee — could be moved to config later
+const DELIVERY_FEE = 150;
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -17,13 +20,75 @@ export async function POST(request: Request) {
     const data = parsed.data;
     const supabase = createAdminClient();
 
-    const subtotal = data.items.reduce(
-      (sum, item) => sum + item.unit_price * item.quantity,
-      0
-    );
-    const delivery_fee = data.type === "delivery" ? 150 : 0;
+    // -----------------------------------------------------------------
+    // SECURITY: Never trust client prices.
+    // Fetch each menu item's current price, name, and availability
+    // straight from the database.
+    // -----------------------------------------------------------------
+    const itemIds = data.items.map((i) => i.menu_item_id);
+
+    const { data: dbItems, error: dbError } = await supabase
+      .from("menu_items")
+      .select("id, name, price, is_available")
+      .in("id", itemIds);
+
+    if (dbError || !dbItems) {
+      console.error("Menu lookup error:", dbError);
+      return NextResponse.json(
+        { error: "Could not validate menu items" },
+        { status: 500 }
+      );
+    }
+
+    // Build a quick lookup map
+    const dbItemMap = new Map(dbItems.map((i) => [i.id, i]));
+
+    // Validate every requested item
+    const verifiedItems: {
+      menu_item_id: string;
+      item_name: string;
+      unit_price: number;
+      quantity: number;
+      line_total: number;
+    }[] = [];
+
+    for (const item of data.items) {
+      const dbItem = dbItemMap.get(item.menu_item_id);
+
+      if (!dbItem) {
+        return NextResponse.json(
+          { error: "Menu item no longer exists" },
+          { status: 400 }
+        );
+      }
+
+      if (!dbItem.is_available) {
+        return NextResponse.json(
+          { error: `"${dbItem.name}" is currently unavailable` },
+          { status: 400 }
+        );
+      }
+
+      const lineTotal = Number(dbItem.price) * item.quantity;
+      verifiedItems.push({
+        menu_item_id: dbItem.id,
+        item_name: dbItem.name,
+        unit_price: Number(dbItem.price),
+        quantity: item.quantity,
+        line_total: lineTotal,
+      });
+    }
+
+    // -----------------------------------------------------------------
+    // Compute totals entirely on the server
+    // -----------------------------------------------------------------
+    const subtotal = verifiedItems.reduce((sum, i) => sum + i.line_total, 0);
+    const delivery_fee = data.type === "delivery" ? DELIVERY_FEE : 0;
     const total = subtotal + delivery_fee;
 
+    // -----------------------------------------------------------------
+    // Create the order
+    // -----------------------------------------------------------------
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .insert({
@@ -51,13 +116,16 @@ export async function POST(request: Request) {
       );
     }
 
-    const orderItems = data.items.map((item) => ({
+    // -----------------------------------------------------------------
+    // Insert verified order items (server-priced)
+    // -----------------------------------------------------------------
+    const orderItems = verifiedItems.map((item) => ({
       order_id: order.id,
       menu_item_id: item.menu_item_id,
       item_name: item.item_name,
       unit_price: item.unit_price,
       quantity: item.quantity,
-      line_total: item.unit_price * item.quantity,
+      line_total: item.line_total,
     }));
 
     const { error: itemsError } = await supabase
@@ -66,12 +134,10 @@ export async function POST(request: Request) {
 
     if (itemsError) {
       console.error("Order items insert error:", itemsError);
+      // Rollback: delete the order so we don't leave an empty shell
+      await supabase.from("orders").delete().eq("id", order.id);
       return NextResponse.json(
-        {
-          error: "Order created but items failed",
-          order_id: order.id,
-          order_number: order.order_number,
-        },
+        { error: "Failed to save order items" },
         { status: 500 }
       );
     }

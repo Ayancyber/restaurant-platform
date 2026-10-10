@@ -3,10 +3,10 @@ import { z } from "zod";
 // =====================================================
 // ORDER SCHEMA
 // =====================================================
+// Client sends ONLY the item ID and quantity. The server fetches
+// the real name and price from the database — never trust client prices.
 export const orderItemSchema = z.object({
   menu_item_id: z.string().uuid(),
-  item_name: z.string().min(1),
-  unit_price: z.number().nonnegative(),
   quantity: z.number().int().positive(),
 });
 

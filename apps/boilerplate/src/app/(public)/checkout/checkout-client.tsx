@@ -76,8 +76,6 @@ export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
       notes: formData.get("notes") as string,
       items: items.map((item) => ({
         menu_item_id: item.id,
-        item_name: item.name,
-        unit_price: item.price,
         quantity: item.quantity,
       })),
     };
