@@ -9,13 +9,10 @@ const nextConfig: NextConfig = {
 
   // The templates/boilerplate folder is a *copy* of a standalone
   // Next.js project. It has its own tsconfig and path aliases that
-  // don't resolve inside the builder. Skip type-checking and linting
-  // it during builder builds — the builder itself is type-safe.
+  // don't resolve inside the builder. Skip type-checking it during
+  // builder builds — the builder itself is type-safe.
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
 };
 
