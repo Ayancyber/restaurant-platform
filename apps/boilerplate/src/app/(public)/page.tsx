@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
+import { getBaseUrl } from "@/lib/site-url";
 import { Reveal } from "@/components/site/reveal";
 
 export const dynamic = "force-dynamic";
@@ -24,8 +25,48 @@ export default async function Home() {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
   const todayHours = hours.find((h) => h.day === today);
 
+  // Structured data for Google rich results (hours, phone, etc. in search)
+  const baseUrl = getBaseUrl();
+
+  const openingHours = hours
+    .filter((h) => !h.closed)
+    .map((h) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: `https://schema.org/${h.day}`,
+      opens: h.open,
+      closes: h.close,
+    }));
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    name: brand.name,
+    description: settings.seo?.description || brand.tagline || "",
+    image:
+      brand.logoUrl && !brand.logoUrl.startsWith("data:")
+        ? `${baseUrl}${brand.logoUrl}`
+        : undefined,
+    url: baseUrl || undefined,
+    telephone: contact.phone,
+    email: contact.email,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: contact.address,
+      addressCountry: "PK",
+    },
+    servesCuisine: settings.seo?.keywords?.join(", ") || undefined,
+    priceRange: "$$",
+    currenciesAccepted: currency,
+    paymentAccepted: "Cash, JazzCash, Easypaisa",
+    openingHoursSpecification: openingHours,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {home.sections.hero && (
         <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-gradient-to-br from-primary/10 via-background to-accent/10">
           {/* Ambient background blobs */}
