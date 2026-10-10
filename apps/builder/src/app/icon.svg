@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <style>
+    /* Default (light browser mode): dark bg, light sparkle */
+    .bg { fill: #0a0a0a; }
+    .fg { fill: #ffffff; }
+
+    /* Dark browser mode: light bg, dark sparkle */
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #fafafa; }
+      .fg { fill: #0a0a0a; }
+    }
+  </style>
+
+  <!-- Rounded square background -->
+  <rect width="64" height="64" rx="14" class="bg"/>
+
+  <!-- Sparkles icon (lucide's "sparkles") centered and scaled -->
+  <g class="fg" transform="translate(32 32) scale(1.4) translate(-12 -12)">
+    <!-- Big sparkle (4-pointed star) -->
+    <path d="M 9.937 15.5 A 2 2 0 0 0 8.063 15.5 L 6.525 18.758 A 1 1 0 0 1 5.032 20.251 L 1.775 21.789 A 2 2 0 0 0 1.775 23.663 L 5.032 25.201 A 1 1 0 0 1 6.525 26.694 L 8.063 29.952 A 2 2 0 0 0 9.937 29.952 L 11.475 26.694 A 1 1 0 0 1 12.968 25.201 L 16.225 23.663 A 2 2 0 0 0 16.225 21.789 L 12.968 20.251 A 1 1 0 0 1 11.475 18.758 L 9.937 15.5 Z"
+          transform="translate(-4 -11) scale(0.9)"/>
+    <!-- Small sparkle (top right) -->
+    <path d="M 20 3 L 21 6 L 24 7 L 21 8 L 20 11 L 19 8 L 16 7 L 19 6 Z"/>
+    <!-- Small dot (bottom) -->
+    <circle cx="5" cy="3" r="1.5"/>
+  </g>
+</svg>
