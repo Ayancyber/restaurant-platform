@@ -36,7 +36,7 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
             <img
               src={brand.logoUrl}
               alt={brand.name}
-              className="h-9 w-9 rounded-full object-cover"
+              className="h-9 w-auto max-w-[140px] object-contain"
             />
           ) : (
             <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
