@@ -210,6 +210,7 @@ create table if not exists public.orders (
   delivery_address text,
   notes text,
   customer_marked_paid_at timestamptz,
+  tracking_token text unique,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

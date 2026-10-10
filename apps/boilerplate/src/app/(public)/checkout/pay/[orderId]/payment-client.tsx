@@ -21,6 +21,7 @@ import type { RestaurantConfig } from "@/config";
 type Order = {
   id: string;
   order_number: string;
+  tracking_token: string | null;
   customer_name: string;
   customer_phone: string;
   payment_method: "jazzcash" | "easypaisa" | "cod";
@@ -264,7 +265,7 @@ export function PaymentClient({
 
       <div className="text-center space-y-3">
         <Button asChild variant="outline">
-          <Link href={`/orders/${order.order_number}`}>
+          <Link href={`/orders/${order.tracking_token ?? order.order_number}`}>
             Track Your Order <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>

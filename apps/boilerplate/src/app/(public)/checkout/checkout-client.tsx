@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useCart } from "@/hooks/use-cart";
+import { saveRecentOrder } from "@/lib/hooks/use-recent-orders";
 import type { RestaurantConfig } from "@/config";
 
 type OrderType = "pickup" | "delivery" | "dine-in";
@@ -98,9 +99,21 @@ export function CheckoutClient({ settings }: { settings: RestaurantConfig }) {
       toast.success(`Order ${result.order_number} placed!`);
       clearCart();
 
+      // Save the tracking token so the customer can find the order later
+      if (result.tracking_token) {
+        saveRecentOrder({
+          orderNumber: result.order_number,
+          token: result.tracking_token,
+          placedAt: Date.now(),
+          total: Number(result.total) || 0,
+        });
+      }
+
       // Redirect based on payment method
       if (paymentMethod === "cod") {
-        router.push(`/checkout/success?order=${result.order_number}`);
+        router.push(
+          `/checkout/success?order=${result.order_number}&token=${result.tracking_token}`
+        );
       } else {
         router.push(`/checkout/pay/${result.order_id}`);
       }

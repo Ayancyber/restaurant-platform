@@ -120,12 +120,12 @@ export function OrderTrackingClient({
   order: initialOrder,
   items: initialItems,
   settings,
-  orderNumber,
+  token,
 }: {
   order: Order;
   items: OrderItem[];
   settings: RestaurantConfig;
-  orderNumber: string;
+  token: string;
 }) {
   const { currency, brand, whatsapp } = settings;
   const [order, setOrder] = useState(initialOrder);
@@ -134,10 +134,11 @@ export function OrderTrackingClient({
   useEffect(() => {
     saveRecentOrder({
       orderNumber: order.order_number,
+      token,
       placedAt: new Date(order.created_at).getTime(),
       total: Number(order.total),
     });
-  }, [order.order_number, order.created_at, order.total]);
+  }, [order.order_number, order.created_at, order.total, token]);
   const [items, setItems] = useState(initialItems);
   const [lastChecked, setLastChecked] = useState<Date>(new Date());
 

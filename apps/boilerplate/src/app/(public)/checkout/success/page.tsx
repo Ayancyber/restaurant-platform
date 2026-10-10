@@ -7,9 +7,9 @@ import { restaurantConfig } from "@/config";
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string }>;
+  searchParams: Promise<{ order?: string; token?: string }>;
 }) {
-  const { order } = await searchParams;
+  const { order, token } = await searchParams;
   const { brand, contact } = restaurantConfig;
 
   return (
@@ -43,9 +43,9 @@ export default async function SuccessPage({
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center flex-wrap">
-            {order && (
+            {(token || order) && (
               <Button asChild size="lg" className="gap-2">
-                <Link href={`/orders/${order}`}>
+                <Link href={`/orders/${token || order}`}>
                   <Package className="h-4 w-4" />
                   Track Your Order
                 </Link>

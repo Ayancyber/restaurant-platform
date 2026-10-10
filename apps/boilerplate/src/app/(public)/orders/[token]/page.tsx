@@ -5,20 +5,26 @@ import { OrderTrackingClient } from "./order-tracking-client";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Order tracking page — accessed via the random tracking token,
+ * NOT the human-readable order number. The token is unguessable,
+ * so orders can't be enumerated by anyone who doesn't have the
+ * exact link the customer received at checkout.
+ */
 export default async function OrderTrackingPage({
   params,
 }: {
-  params: Promise<{ orderNumber: string }>;
+  params: Promise<{ token: string }>;
 }) {
-  const { orderNumber } = await params;
+  const { token } = await params;
   const supabase = createAdminClient();
 
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_phone, type, status, payment_method, payment_status, subtotal, delivery_fee, total, delivery_address, notes, created_at, updated_at"
+      "id, order_number, tracking_token, customer_name, customer_phone, type, status, payment_method, payment_status, subtotal, delivery_fee, total, delivery_address, notes, created_at, updated_at"
     )
-    .eq("order_number", orderNumber)
+    .eq("tracking_token", token)
     .single();
 
   if (!order) {
@@ -37,7 +43,7 @@ export default async function OrderTrackingPage({
       order={order}
       items={items ?? []}
       settings={settings}
-      orderNumber={orderNumber}
+      token={token}
     />
   );
 }

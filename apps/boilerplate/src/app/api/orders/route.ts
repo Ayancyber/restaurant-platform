@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server";
+import { randomBytes } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { orderSchema } from "@/lib/validators";
+
+/**
+ * Generate a URL-safe, cryptographically random token.
+ * 15 bytes → 20 base64 chars → stripped of +/= → ~20 URL-safe chars.
+ * This is the token used to view the order at /orders/[token].
+ */
+function generateTrackingToken(): string {
+  return randomBytes(15)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
+}
 
 // Delivery fee — could be moved to config later
 const DELIVERY_FEE = 150;
@@ -104,8 +118,9 @@ export async function POST(request: Request) {
         total,
         delivery_address: data.delivery_address || null,
         notes: data.notes || null,
+        tracking_token: generateTrackingToken(),
       })
-      .select("id, order_number")
+      .select("id, order_number, tracking_token")
       .single();
 
     if (orderError || !order) {
@@ -146,6 +161,7 @@ export async function POST(request: Request) {
       success: true,
       order_id: order.id,
       order_number: order.order_number,
+      tracking_token: order.tracking_token,
       total,
     });
   } catch (error) {

@@ -8,6 +8,7 @@ const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export type RecentOrder = {
   orderNumber: string;
+  token: string;      // public tracking token — used in /orders/[token]
   placedAt: number;
   total: number;
 };
@@ -20,7 +21,16 @@ export function getRecentOrders(): RecentOrder[] {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
     const cutoff = Date.now() - MAX_AGE_MS;
-    return parsed.filter((o) => o.placedAt > cutoff);
+    // Filter: not expired, and must have a token (older entries from
+    // before the token feature are not trackable — drop them).
+    return parsed.filter(
+      (o) =>
+        o &&
+        typeof o.placedAt === "number" &&
+        o.placedAt > cutoff &&
+        typeof o.token === "string" &&
+        o.token.length > 0
+    );
   } catch {
     return [];
   }

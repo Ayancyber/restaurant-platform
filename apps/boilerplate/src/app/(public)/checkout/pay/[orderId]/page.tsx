@@ -18,7 +18,7 @@ export default async function PaymentPage({
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, order_number, customer_name, customer_phone, payment_method, payment_status, total, status, customer_marked_paid_at"
+      "id, order_number, tracking_token, customer_name, customer_phone, payment_method, payment_status, total, status, customer_marked_paid_at"
     )
     .eq("id", orderId)
     .single();

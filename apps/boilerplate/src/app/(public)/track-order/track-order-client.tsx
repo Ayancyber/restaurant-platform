@@ -1,15 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Loader2, Package, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
 import type { RestaurantConfig } from "@/config";
 import {
   useRecentOrders,
@@ -18,41 +14,10 @@ import {
 
 export function TrackOrderClient({ settings }: { settings: RestaurantConfig }) {
   const router = useRouter();
-  const [orderNumber, setOrderNumber] = useState("");
-  const [checking, setChecking] = useState(false);
   const { orders: recent, mounted } = useRecentOrders();
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const trimmed = orderNumber.trim().toUpperCase();
-
-    if (!trimmed) {
-      toast.error("Please enter your order number");
-      return;
-    }
-
-    setChecking(true);
-
-    try {
-      const res = await fetch(
-        `/api/orders/find/${encodeURIComponent(trimmed)}`
-      );
-      if (res.ok) {
-        router.push(`/orders/${trimmed}`);
-      } else if (res.status === 404) {
-        toast.error("Order not found. Check the number and try again.");
-      } else {
-        toast.error("Something went wrong. Please try again.");
-      }
-    } catch {
-      toast.error("Network error. Check your connection.");
-    } finally {
-      setChecking(false);
-    }
-  }
-
-  function goToRecent(num: string) {
-    router.push(`/orders/${num}`);
+  function goToOrder(token: string) {
+    router.push(`/orders/${token}`);
   }
 
   if (!mounted) {
@@ -79,102 +44,81 @@ export function TrackOrderClient({ settings }: { settings: RestaurantConfig }) {
         </div>
         <h1 className="font-heading text-3xl font-bold">Track Your Order</h1>
         <p className="text-muted-foreground mt-2">
-          Enter your order number to see live status.
+          {recent.length > 0
+            ? "Tap any order to see its live status."
+            : "Orders placed on this device appear here automatically."}
         </p>
       </div>
 
-      <Card>
-        <CardContent className="p-6 space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="orderNumber">Order Number</Label>
-              <Input
-                id="orderNumber"
-                value={orderNumber}
-                onChange={(e) => setOrderNumber(e.target.value)}
-                placeholder="ORD-20261005-0011"
-                className="font-mono"
-                autoComplete="off"
-                autoCapitalize="characters"
-              />
-              <p className="text-xs text-muted-foreground">
-                Found on your order confirmation screen or in WhatsApp
-                messages.
-              </p>
-            </div>
-
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full gap-2"
-              disabled={checking || !orderNumber.trim()}
-            >
-              {checking ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Searching...
-                </>
-              ) : (
-                <>
-                  <Search className="h-4 w-4" />
-                  Find My Order
-                </>
-              )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      {recent.length > 0 && (
-        <div className="mt-8">
-          <div className="flex items-center justify-between mb-3">
+      {recent.length > 0 ? (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-muted-foreground">
               Recent orders on this device
             </p>
             <button
               type="button"
               onClick={() => clearRecentOrders()}
-              className="text-xs text-muted-foreground hover:text-destructive"
+              className="text-xs text-muted-foreground hover:text-destructive transition-colors"
             >
               Clear
             </button>
           </div>
 
-          <div className="space-y-2">
-            {recent.map((o) => (
-              <button
-                key={o.orderNumber}
-                type="button"
-                onClick={() => goToRecent(o.orderNumber)}
-                className="w-full rounded-lg border p-3 text-left hover:border-primary transition-colors flex items-center justify-between gap-3"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="font-mono text-xs">
-                      {o.orderNumber}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {new Date(o.placedAt).toLocaleString("en-PK", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    })}
-                  </p>
+          {recent.map((o) => (
+            <button
+              key={o.token}
+              type="button"
+              onClick={() => goToOrder(o.token)}
+              className="w-full rounded-lg border p-3 text-left hover:border-primary transition-colors flex items-center justify-between gap-3"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="font-mono text-xs">
+                    {o.orderNumber}
+                  </Badge>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-sm font-medium">
-                    {settings.currency} {o.total.toLocaleString()}
-                  </span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </button>
-            ))}
-          </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {new Date(o.placedAt).toLocaleString("en-PK", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-sm font-medium">
+                  {settings.currency} {o.total.toLocaleString()}
+                </span>
+                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </button>
+          ))}
         </div>
+      ) : (
+        <Card>
+          <CardContent className="p-8 text-center space-y-4">
+            <div className="mx-auto w-fit rounded-full bg-muted p-4">
+              <Package className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="font-medium">No recent orders on this device</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Place an order and it will show up here so you can track it
+                anytime.
+              </p>
+            </div>
+            <Button asChild className="gap-2">
+              <Link href="/menu">
+                Browse Menu
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       <p className="text-center text-sm text-muted-foreground mt-8">
-        Can&apos;t find your order?{" "}
+        Ordered on a different device?{" "}
         <a
           href={`tel:${settings.contact.phone}`}
           className="text-primary hover:underline"
