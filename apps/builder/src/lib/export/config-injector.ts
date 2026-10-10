@@ -11,7 +11,7 @@ export function buildRestaurantConfig(data: WizardData) {
       tagline: data.brand.tagline || "",
       heroPunchline: data.brand.heroPunchline || "",
       logoUrl: data.brand.logoDataUrl || "/logo.svg",
-      faviconUrl: "/favicon.ico",
+      faviconUrl: data.brand.logoDataUrl || "/favicon.ico",
     },
     theme: {
       primaryColor: data.theme.primaryColor,

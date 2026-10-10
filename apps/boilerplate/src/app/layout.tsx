@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: restaurantConfig.seo.title,
   description: restaurantConfig.seo.description,
   keywords: restaurantConfig.seo.keywords,
+  icons: {
+    icon: restaurantConfig.brand.faviconUrl || "/favicon.ico",
+    shortcut: restaurantConfig.brand.faviconUrl || "/favicon.ico",
+    apple: restaurantConfig.brand.faviconUrl || "/favicon.ico",
+  },
 };
 
 function getContrastColor(hex: string): string {

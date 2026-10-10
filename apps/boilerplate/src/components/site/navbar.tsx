@@ -32,9 +32,17 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
-            {brand.name.charAt(0)}
-          </div>
+          {brand.logoUrl && brand.logoUrl !== "/logo.svg" ? (
+            <img
+              src={brand.logoUrl}
+              alt={brand.name}
+              className="h-9 w-9 rounded-full object-cover"
+            />
+          ) : (
+            <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
+              {brand.name.charAt(0)}
+            </div>
+          )}
           <span className="font-heading text-xl font-semibold tracking-tight">
             {brand.name}
           </span>
