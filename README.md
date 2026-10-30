@@ -123,7 +123,7 @@ corepack prepare pnpm@9.0.0 --activate
 ### 1) Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Ayancyber/restaurant-platform
 cd restaurant-platform
 ```
 
