@@ -1,5 +1,5 @@
 # Restaurant Platform
-
+**🔗 [Click here to view the Live Demo](https://restaurant-builder.vercel.app/)**
 A full-stack restaurant platform built as a PNPM monorepo with two Next.js applications:
 
 - `apps/boilerplate` — a production-ready restaurant website with customer-facing pages, admin dashboard, reservations, orders, payments, and content management.
