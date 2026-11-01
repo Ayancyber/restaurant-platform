@@ -128,28 +128,32 @@ Questions? See README.md for full documentation.
 `
   );
 
-  // 8. Handle the uploaded logo — write it in TWO places:
-  //    a) public/logo.{ext}   → used by navbar (<img src="/logo.*">)
-  //    b) src/app/icon.png    → Next.js auto-serves as favicon
-  //
-  //    The favicon is always named .png because browsers parse .ico
-  //    files with a strict ICO-format parser; a PNG inside a .ico file
-  //    gets silently rejected. A .png file always works regardless of
-  //    the source format.
-  if (data.brand.logoDataUrl && data.brand.logoDataUrl.startsWith("data:")) {
+  // 8. Export the uploaded logo in its original image format.
+  if (data.brand.logoDataUrl?.startsWith("data:")) {
     const match = data.brand.logoDataUrl.match(
-      /^data:image\/(\w+);base64,(.+)$/
+      /^data:(image\/[-a-z0-9.+]+);base64,(.+)$/i
     );
+
     if (match) {
-      const rawExt = match[1].toLowerCase();
-      const ext = rawExt === "jpeg" ? "jpg" : rawExt;
-      const buffer = Buffer.from(match[2], "base64");
+      const mime = match[1].toLowerCase();
+      const ext = mime === "image/jpeg"
+        ? "jpg"
+        : mime === "image/svg+xml"
+          ? "svg"
+          : mime.replace("image/", "");
 
-      // (a) navbar logo — keep the source format
-      zip.file(`public/logo.${ext}`, buffer);
+      zip.file(`public/logo.${ext}`, Buffer.from(match[2], "base64"));
+    }
+  }
 
-      // (b) favicon — always PNG-extension
-      zip.file("src/app/icon.png", buffer);
+  // 9. Export the separately uploaded PNG favicon.
+  if (data.brand.faviconDataUrl?.startsWith("data:image/png;base64,")) {
+    const match = data.brand.faviconDataUrl.match(
+      /^data:image\/png;base64,(.+)$/i
+    );
+
+    if (match) {
+      zip.file("public/favicon.png", Buffer.from(match[1], "base64"));
     }
   }
 

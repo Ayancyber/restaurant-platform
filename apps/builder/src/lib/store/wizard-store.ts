@@ -9,6 +9,7 @@ export type WizardData = {
     tagline: string;
     heroPunchline: string;
     logoDataUrl: string;
+    faviconDataUrl: string;
   };
   theme: {
     primaryColor: string;
@@ -20,6 +21,8 @@ export type WizardData = {
     phone: string;
     email: string;
     address: string;
+    instagram: string;
+    facebook: string;
   };
   hours: Array<{
     day: string;
@@ -69,14 +72,20 @@ export type WizardData = {
 };
 
 const defaultData: WizardData = {
-  brand: { name: "", tagline: "", heroPunchline: "", logoDataUrl: "" },
+  brand: { name: "", tagline: "", heroPunchline: "", logoDataUrl: "", faviconDataUrl: "" },
   theme: {
     primaryColor: "#c2410c",
     accentColor: "#facc15",
     fontHeading: "Playfair Display",
     fontBody: "Inter",
   },
-  contact: { phone: "", email: "", address: "" },
+  contact: {
+    phone: "",
+    email: "",
+    address: "",
+    instagram: "",
+    facebook: "",
+  },
   hours: [
     { day: "Monday", open: "11:00", close: "22:00", closed: false },
     { day: "Tuesday", open: "11:00", close: "22:00", closed: false },

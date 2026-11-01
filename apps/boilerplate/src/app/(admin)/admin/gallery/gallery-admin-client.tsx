@@ -13,8 +13,6 @@ import {
   ImageOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -178,126 +176,225 @@ export function GalleryAdminClient({
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between flex-wrap gap-3">
+    <div className="space-y-10">
+      <header className="flex flex-col justify-between gap-5 border-b border-border/70 pb-7 sm:flex-row sm:items-end">
         <div>
-          <h1 className="font-heading text-3xl font-bold">Gallery</h1>
-          <p className="text-muted-foreground mt-1">
-            {images.length} images •{" "}
-            {images.filter((i) => i.is_active).length} active
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+            Visual identity / Photography
+          </p>
+          <h1 className="font-heading text-4xl font-medium tracking-tight sm:text-5xl">
+            The gallery<span className="text-primary">.</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+            Curate the images that tell your restaurant's story, one frame at a time.
           </p>
         </div>
-        <Button onClick={openNew} className="gap-2">
+
+        <Button onClick={openNew} className="h-11 gap-2 self-start px-5 sm:self-auto">
           <Plus className="h-4 w-4" />
-          Add Image
+          Add image
         </Button>
       </header>
 
-      {images.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center">
-            <div className="flex flex-col items-center gap-3 text-muted-foreground">
-              <ImageOff className="h-10 w-10" />
-              <p>No images yet. Click "Add Image" to upload one.</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {images.map((img) => (
-            <Card key={img.id} className="overflow-hidden group">
-              <div className="aspect-square relative bg-muted">
-                <img
-                  src={img.image_url}
-                  alt={img.title ?? ""}
-                  className="h-full w-full object-cover"
-                />
-                {!img.is_active && (
-                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                    <Badge variant="destructive">Hidden</Badge>
-                  </div>
-                )}
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    size="icon"
-                    variant="secondary"
-                    className="h-8 w-8"
-                    onClick={() => toggleActive(img.id, !img.is_active)}
-                    title={img.is_active ? "Hide" : "Show"}
-                  >
-                    {img.is_active ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="secondary"
-                    className="h-8 w-8"
-                    onClick={() => openEdit(img)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    className="h-8 w-8"
-                    onClick={() => handleDelete(img.id)}
-                    disabled={deletingId === img.id}
-                  >
-                    {deletingId === img.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-              {img.title && (
-                <CardContent className="p-3">
-                  <p className="text-sm font-medium truncate">{img.title}</p>
-                  {img.description && (
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">
-                      {img.description}
-                    </p>
-                  )}
-                </CardContent>
-              )}
-            </Card>
-          ))}
+      <section className="grid grid-cols-2 gap-4 border-b border-border/70 pb-7 sm:grid-cols-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Total images
+          </p>
+          <p className="mt-2 font-heading text-3xl tabular-nums">
+            {String(images.length).padStart(2, "0")}
+          </p>
         </div>
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Published
+          </p>
+          <p className="mt-2 font-heading text-3xl tabular-nums">
+            {String(images.filter((img) => img.is_active).length).padStart(2, "0")}
+          </p>
+        </div>
+        <div className="col-span-2 sm:col-span-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Hidden
+          </p>
+          <p className="mt-2 font-heading text-3xl tabular-nums">
+            {String(images.filter((img) => !img.is_active).length).padStart(2, "0")}
+          </p>
+        </div>
+      </section>
+
+      {images.length === 0 ? (
+        <div className="border-y border-border/70 py-20 text-center">
+          <ImageOff className="mx-auto h-9 w-9 text-primary/50" strokeWidth={1.2} />
+          <h2 className="mt-5 font-heading text-2xl">Every story begins with a frame.</h2>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
+            Add your first photograph to start building your restaurant's visual collection.
+          </p>
+          <Button onClick={openNew} className="mt-6 gap-2">
+            <Plus className="h-4 w-4" />
+            Upload first image
+          </Button>
+        </div>
+      ) : (
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Image collection
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {images.length} {images.length === 1 ? "frame" : "frames"}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
+            {images.map((img, idx) => (
+              <article key={img.id} className="group min-w-0">
+                <div
+                  className={`relative overflow-hidden bg-muted ${
+                    idx % 5 === 0
+                      ? "aspect-[4/5]"
+                      : idx % 5 === 1
+                        ? "aspect-[5/4]"
+                        : idx % 5 === 2
+                          ? "aspect-square"
+                          : idx % 5 === 3
+                            ? "aspect-[4/5]"
+                            : "aspect-[5/4]"
+                  }`}
+                >
+                  <img
+                    src={img.image_url}
+                    alt={img.title ?? "Gallery photograph"}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.035]"
+                  />
+
+                  <div className="absolute left-3 top-3">
+                    <span className="bg-background/90 px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] text-foreground backdrop-blur-sm">
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  {!img.is_active && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/45">
+                      <span className="border border-white/50 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white backdrop-blur-sm">
+                        Hidden from site
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-9 w-9 shadow-sm"
+                      onClick={() => toggleActive(img.id, !img.is_active)}
+                      title={img.is_active ? "Hide from site" : "Show on site"}
+                      aria-label={img.is_active ? "Hide image" : "Show image"}
+                    >
+                      {img.is_active ? (
+                        <Eye className="h-4 w-4" />
+                      ) : (
+                        <EyeOff className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      className="h-9 w-9 shadow-sm"
+                      onClick={() => openEdit(img)}
+                      title="Edit image"
+                      aria-label="Edit image"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="h-9 w-9 shadow-sm"
+                      onClick={() => handleDelete(img.id)}
+                      disabled={deletingId === img.id}
+                      title="Delete image"
+                      aria-label="Delete image"
+                    >
+                      {deletingId === img.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex items-start justify-between gap-3 border-b border-border/70 py-3">
+                  <div className="min-w-0">
+                    <h2 className="truncate font-heading text-lg font-medium">
+                      {img.title || "Untitled image"}
+                    </h2>
+                    {img.description ? (
+                      <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">
+                        {img.description}
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-xs italic text-muted-foreground/65">
+                        No description
+                      </p>
+                    )}
+                  </div>
+                  <span className="mt-1 flex shrink-0 items-center gap-1.5">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        img.is_active ? "bg-emerald-600" : "bg-muted-foreground/40"
+                      }`}
+                    />
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      {img.is_active ? "Live" : "Hidden"}
+                    </span>
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-lg gap-6 overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              {editing ? "Edit Image" : "Add Image"}
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
+              Visual collection
+            </p>
+            <DialogTitle className="font-heading text-2xl font-medium">
+              {editing ? "Refine photograph" : "Add a photograph"}
             </DialogTitle>
-            <DialogDescription>
-              Upload an image and add details.
+            <DialogDescription className="text-sm leading-6">
+              Upload an image and give it a little context for your guests.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label>Image *</Label>
+
               {previewUrl ? (
-                <div className="relative aspect-video rounded-md overflow-hidden bg-muted">
+                <div className="relative aspect-[5/3] overflow-hidden bg-muted">
                   <img
                     src={previewUrl}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
+                    alt="Selected image preview"
+                    className="h-full w-full object-contain"
                   />
+                  <span className="absolute bottom-3 left-3 bg-background/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] backdrop-blur-sm">
+                    Preview
+                  </span>
                 </div>
               ) : (
-                <div className="aspect-video rounded-md border-2 border-dashed flex items-center justify-center text-muted-foreground">
-                  <ImageOff className="h-8 w-8" />
+                <div className="flex aspect-[5/3] flex-col items-center justify-center border border-dashed border-border bg-muted/30 text-muted-foreground">
+                  <ImageOff className="h-8 w-8" strokeWidth={1.2} />
+                  <p className="mt-3 text-sm">Your photograph will appear here</p>
                 </div>
               )}
 
-              <label className="cursor-pointer block">
+              <label className="block cursor-pointer">
                 <input
                   type="file"
                   accept="image/*"
@@ -305,7 +402,7 @@ export function GalleryAdminClient({
                   className="hidden"
                   disabled={uploading}
                 />
-                <div className="w-full h-10 inline-flex items-center justify-center gap-2 rounded-md border bg-background hover:bg-muted text-sm font-medium cursor-pointer">
+                <span className="inline-flex h-11 w-full items-center justify-center gap-2 border border-border bg-background text-sm font-medium transition-colors hover:bg-muted">
                   {uploading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -314,23 +411,24 @@ export function GalleryAdminClient({
                   ) : (
                     <>
                       <Upload className="h-4 w-4" />
-                      {previewUrl ? "Replace Image" : "Upload Image"}
+                      {previewUrl ? "Replace photograph" : "Choose photograph"}
                     </>
                   )}
-                </div>
+                </span>
               </label>
               <p className="text-xs text-muted-foreground">
-                Max 5MB • JPG, PNG, WEBP, GIF
+                Maximum 5MB · JPG, PNG, WEBP or GIF
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">Image title</Label>
               <Input
                 id="title"
                 name="title"
-                placeholder="Signature Pasta"
+                placeholder="e.g. A signature dish"
                 defaultValue={editing?.title ?? ""}
+                className="h-11"
               />
             </div>
 
@@ -339,36 +437,47 @@ export function GalleryAdminClient({
               <Textarea
                 id="description"
                 name="description"
-                rows={2}
+                rows={3}
+                placeholder="Add a short description..."
                 defaultValue={editing?.description ?? ""}
+                className="resize-none"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sort_order">Sort Order</Label>
+              <Label htmlFor="sort_order">Display order</Label>
               <Input
                 id="sort_order"
                 name="sort_order"
                 type="number"
                 defaultValue={editing?.sort_order ?? 0}
+                className="h-11"
               />
+              <p className="text-xs text-muted-foreground">
+                Lower numbers appear earlier in the public gallery.
+              </p>
             </div>
 
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-3 border-y border-border/70 py-4 text-sm">
               <input
                 type="checkbox"
                 name="is_active"
                 defaultChecked={editing?.is_active ?? true}
-                className="rounded"
+                className="h-4 w-4 rounded accent-primary"
               />
-              Show on public site
+              <span>
+                <span className="block font-medium">Show on public site</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">
+                  Make this photograph visible to your guests.
+                </span>
+              </span>
             </label>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-1">
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1"
+                className="h-11 flex-1"
                 onClick={() => setDialogOpen(false)}
                 disabled={submitting}
               >
@@ -376,11 +485,11 @@ export function GalleryAdminClient({
               </Button>
               <Button
                 type="submit"
-                className="flex-1 gap-2"
+                className="h-11 flex-1 gap-2"
                 disabled={submitting || uploading}
               >
                 {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                {editing ? "Save Changes" : "Add Image"}
+                {editing ? "Save changes" : "Add image"}
               </Button>
             </div>
           </form>

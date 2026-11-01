@@ -173,8 +173,8 @@ export function OrderTrackingClient({
 
   if (order.status === "cancelled") {
     return (
-      <div className="container mx-auto max-w-2xl px-4 py-16">
-        <Card className="border-destructive/30">
+      <main className="min-h-[70vh] bg-[#faf8f4] px-5 py-16 text-[#30251f]"><div className="mx-auto max-w-3xl">
+        <Card className="rounded-none border border-red-200 bg-[#f4efe8] shadow-none">
           <CardContent className="p-8 text-center">
             <div className="mx-auto w-fit rounded-full bg-destructive/10 p-4">
               <XCircle className="h-12 w-12 text-destructive" />
@@ -182,7 +182,7 @@ export function OrderTrackingClient({
             <h1 className="font-heading text-3xl font-bold mt-6">
               Order Cancelled
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="mt-3 text-xs leading-6 text-[#8b7b6d]">
               Order {order.order_number} was cancelled.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
@@ -195,7 +195,7 @@ export function OrderTrackingClient({
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div></main>
     );
   }
 
@@ -225,10 +225,10 @@ export function OrderTrackingClient({
     order.status === "delivered" || order.status === "completed";
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-12">
+    <main className="min-h-screen bg-[#faf8f4] px-5 py-10 text-[#30251f] sm:py-14"><div className="mx-auto max-w-4xl">
       <Link
         href="/"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
+        className="mb-9 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[#8b7b6d] transition-colors hover:text-[#9a5639]"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Home
@@ -237,12 +237,12 @@ export function OrderTrackingClient({
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="font-heading text-3xl font-bold">Track Order</h1>
-          <Badge variant="secondary" className="font-mono text-xs">
+          <h1 className="font-heading text-4xl font-medium tracking-tight sm:text-5xl">On its way<span className="text-[#a65e40]">.</span></h1>
+          <Badge variant="secondary" className="rounded-none border border-[#e2d8cb] bg-[#f1e9df] font-mono text-xs text-[#8f4932]">
             {order.order_number}
           </Badge>
         </div>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-3 text-xs leading-6 text-[#8b7b6d]">
           Placed on{" "}
           {createdDate.toLocaleString("en-PK", {
             dateStyle: "medium",
@@ -252,19 +252,19 @@ export function OrderTrackingClient({
       </div>
 
       {/* Live status banner */}
-      <Card className="mb-6 border-primary/30 bg-primary/5">
+      <Card className="mb-7 rounded-none border border-[#d9c7b5] bg-[#f1e9df] shadow-none">
         <CardContent className="p-6 flex items-center gap-4">
-          <div className="h-14 w-14 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#d9c7b5] bg-[#e8d9c9] text-[#8f4932]">
             <currentStep.icon className="h-7 w-7" />
           </div>
           <div className="flex-1">
-            <p className="text-xs uppercase tracking-wider text-primary font-medium">
+            <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-[#8f4932]">
               Current Status
             </p>
-            <p className="font-heading text-2xl font-bold">
+            <p className="font-heading text-2xl font-medium sm:text-3xl">
               {currentStep.label}
             </p>
-            <p className="text-sm text-muted-foreground mt-0.5">
+            <p className="mt-1 text-sm text-[#817469]">
               {currentStep.description}
             </p>
           </div>
@@ -278,12 +278,12 @@ export function OrderTrackingClient({
       </Card>
 
       {/* Timeline */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-base">Order Progress</CardTitle>
+      <Card className="mb-7 rounded-none border-[#e2d8cb] bg-[#f4efe8] shadow-none">
+        <CardHeader className="border-b border-[#e2d8cb] pb-4">
+          <CardTitle className="font-heading text-xl font-medium">Order Progress</CardTitle>
         </CardHeader>
         <CardContent>
-          <ol className="space-y-1">
+          <ol className="space-y-2">
             {STATUS_STEPS.map((step, idx) => {
               const Icon = step.icon;
               const isDone = idx < activeIndex;
@@ -325,7 +325,7 @@ export function OrderTrackingClient({
                     >
                       {step.label}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-[#817469]">
                       {step.description}
                     </p>
                   </div>
@@ -337,12 +337,12 @@ export function OrderTrackingClient({
       </Card>
 
       {/* Order details */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-base">Order Details</CardTitle>
+      <Card className="mb-7 rounded-none border-[#e2d8cb] bg-[#f4efe8] shadow-none">
+        <CardHeader className="border-b border-[#e2d8cb] pb-4">
+          <CardTitle className="font-heading text-xl font-medium">Order Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {items.map((item) => (
               <li key={item.id} className="flex justify-between text-sm">
                 <div className="flex gap-3">
@@ -358,18 +358,18 @@ export function OrderTrackingClient({
             ))}
           </ul>
 
-          <div className="border-t my-4" />
+          <div className="my-5 border-t border-[#ded3c6]" />
 
-          <div className="space-y-2 text-sm">
+          <div className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
+              <span className="text-[#817469]">Subtotal</span>
               <span>
                 {currency} {Number(order.subtotal).toLocaleString()}
               </span>
             </div>
             {Number(order.delivery_fee) > 0 && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Delivery</span>
+                <span className="text-[#817469]">Delivery</span>
                 <span>
                   {currency} {Number(order.delivery_fee).toLocaleString()}
                 </span>
@@ -377,7 +377,7 @@ export function OrderTrackingClient({
             )}
             <div className="flex justify-between text-base font-semibold pt-2 border-t">
               <span>Total</span>
-              <span className="text-primary">
+              <span className="text-[#8f4932]">
                 {currency} {Number(order.total).toLocaleString()}
               </span>
             </div>
@@ -387,21 +387,21 @@ export function OrderTrackingClient({
 
       {/* Info row */}
       <div className="grid gap-4 sm:grid-cols-2 mb-6">
-        <Card>
+        <Card className="rounded-none border-[#e2d8cb] bg-[#f4efe8] shadow-none">
           <CardContent className="p-5 space-y-3 text-sm">
             <p className="font-medium text-xs uppercase tracking-wider text-muted-foreground">
               Order Info
             </p>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Type</span>
+              <span className="text-[#817469]">Type</span>
               <span className="capitalize">{order.type}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Payment</span>
+              <span className="text-[#817469]">Payment</span>
               <span>{methodLabel}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Status</span>
+              <span className="text-[#817469]">Status</span>
               <Badge
                 variant={
                   order.payment_status === "paid" ? "default" : "secondary"
@@ -414,22 +414,22 @@ export function OrderTrackingClient({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-none border-[#e2d8cb] bg-[#f4efe8] shadow-none">
           <CardContent className="p-5 space-y-3 text-sm">
             <p className="font-medium text-xs uppercase tracking-wider text-muted-foreground">
               Contact
             </p>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Name</span>
+              <span className="text-[#817469]">Name</span>
               <span>{order.customer_name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Phone</span>
-              <span className="font-mono text-xs">{order.customer_phone}</span>
+              <span className="text-[#817469]">Phone</span>
+              <span className="rounded-none border border-[#e2d8cb] bg-[#f1e9df] font-mono text-xs text-[#8f4932]">{order.customer_phone}</span>
             </div>
             {order.delivery_address && (
               <div className="pt-2 border-t">
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-[#8b7b6d]">
                   Delivery Address
                 </p>
                 <p className="mt-1">{order.delivery_address}</p>
@@ -440,7 +440,7 @@ export function OrderTrackingClient({
       </div>
 
       {order.notes && (
-        <Card className="mb-6">
+        <Card className="mb-7 rounded-none border-[#e2d8cb] bg-[#f4efe8] shadow-none">
           <CardContent className="p-5 text-sm">
             <p className="font-medium text-xs uppercase tracking-wider text-muted-foreground mb-2">
               Notes
@@ -451,12 +451,12 @@ export function OrderTrackingClient({
       )}
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         {whatsappLink && (
           <Button
             asChild
             size="lg"
-            className="flex-1 gap-2 bg-green-600 hover:bg-green-700"
+            className="h-12 flex-1 gap-2 rounded-none bg-[#536b52] text-xs uppercase tracking-[0.12em] hover:bg-[#40553f]"
           >
             <a
               href={whatsappLink}
@@ -468,7 +468,7 @@ export function OrderTrackingClient({
             </a>
           </Button>
         )}
-        <Button asChild variant="outline" size="lg" className="gap-2">
+        <Button asChild variant="outline" size="lg" className="h-12 gap-2 rounded-none border-[#d9cfc2] bg-transparent text-xs uppercase tracking-[0.12em] text-[#55483e] hover:bg-[#f1e9df]">
           <a href={`tel:${settings.contact.phone}`}>
             <Phone className="h-4 w-4" />
             Call Restaurant
@@ -476,7 +476,7 @@ export function OrderTrackingClient({
         </Button>
       </div>
 
-      <p className="text-xs text-muted-foreground text-center mt-6">
+      <p className="mt-7 text-center text-[10px] leading-6 tracking-wide text-[#8b7b6d]">
         {isFinished ? (
           <>
             Completed at{" "}
@@ -494,6 +494,6 @@ export function OrderTrackingClient({
           </>
         )}
       </p>
-    </div>
+    </div></main>
   );
 }

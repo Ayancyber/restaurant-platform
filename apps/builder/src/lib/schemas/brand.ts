@@ -16,6 +16,7 @@ export const brandSchema = z.object({
     .optional()
     .or(z.literal("")),
   logoDataUrl: z.string().optional().or(z.literal("")),
+  faviconDataUrl: z.string().optional().or(z.literal("")),
 });
 
 export type BrandFormData = z.infer<typeof brandSchema>;

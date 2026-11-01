@@ -30,6 +30,8 @@ export function ContactStep() {
       phone: "",
       email: "",
       address: "",
+      instagram: "",
+      facebook: "",
       hours: data.hours,
     },
     mode: "onChange",
@@ -47,6 +49,8 @@ export function ContactStep() {
       phone: data.contact.phone,
       email: data.contact.email,
       address: data.contact.address,
+      instagram: data.contact.instagram,
+      facebook: data.contact.facebook,
       hours: data.hours,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,6 +64,8 @@ export function ContactStep() {
         phone: values.phone || "",
         email: values.email || "",
         address: values.address || "",
+        instagram: values.instagram || "",
+        facebook: values.facebook || "",
       });
       if (values.hours) {
         updateData("hours", values.hours as ContactFormData["hours"]);
@@ -136,6 +142,32 @@ export function ContactStep() {
             {errors.address && (
               <p className="text-xs text-destructive">{errors.address.message}</p>
             )}
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="instagram">Instagram URL (Optional)</Label>
+              <Input
+                id="instagram"
+                type="url"
+                placeholder="https://instagram.com/yourrestaurant"
+                {...register("instagram")}
+              />
+              {errors.instagram && (
+                <p className="text-xs text-destructive">{errors.instagram.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="facebook">Facebook URL (Optional)</Label>
+              <Input
+                id="facebook"
+                type="url"
+                placeholder="https://facebook.com/yourrestaurant"
+                {...register("facebook")}
+              />
+              {errors.facebook && (
+                <p className="text-xs text-destructive">{errors.facebook.message}</p>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

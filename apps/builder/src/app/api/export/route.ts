@@ -13,6 +13,7 @@ const dataSchema = z.object({
     tagline: z.string(),
     heroPunchline: z.string(),
     logoDataUrl: z.string(),
+    faviconDataUrl: z.string().optional().default(""),
   }),
   theme: z.object({
     primaryColor: z.string(),

@@ -22,21 +22,39 @@ export default async function MenuPage() {
     .order("sort_order");
 
   return (
-    <div className="container mx-auto px-4 py-16">
-      <Reveal as="header" className="mb-12 text-center">
-        <h1 className="font-heading text-4xl font-bold sm:text-5xl">
-          Our Menu
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          {settings.brand.tagline}
-        </p>
-      </Reveal>
+    <main className="min-h-screen bg-[#f7f4ed]">
+      <section className="border-b border-[#ded6ca]">
+        <div className="mx-auto max-w-[1600px] px-5 pb-14 pt-16 sm:px-10 sm:pb-20 sm:pt-24 lg:px-16 xl:px-24">
+          <Reveal variant="fade-up">
+            <p className="mb-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-primary sm:text-xs">
+              <span className="h-px w-10 bg-primary" />
+              A taste of what we offer
+            </p>
+            <div className="grid gap-8 md:grid-cols-[1fr_0.55fr] md:items-end">
+              <h1 className="max-w-[900px] font-heading text-[clamp(3.8rem,9vw,8rem)] font-medium leading-[0.88] tracking-[-0.065em] text-[#29251f]">
+                Our menu<span className="text-primary">.</span>
+              </h1>
+              <p className="max-w-[390px] text-sm leading-7 text-[#776e62] md:ml-auto md:pb-2 sm:text-base">
+                {settings.brand.tagline}
+              </p>
+            </div>
+          </Reveal>
+          <div className="mt-12 flex items-center justify-between border-t border-[#ded6ca] pt-5">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#8b8175]">
+              Explore the selection
+            </span>
+            <span className="font-heading text-2xl italic text-primary">01</span>
+          </div>
+        </div>
+      </section>
 
-      <MenuClient
-        categories={categories ?? []}
-        items={items ?? []}
-        currency={settings.currency}
-      />
-    </div>
+      <section className="mx-auto max-w-[1600px] px-5 py-12 sm:px-10 sm:py-16 lg:px-16 xl:px-24">
+        <MenuClient
+          categories={categories ?? []}
+          items={items ?? []}
+          currency={settings.currency}
+        />
+      </section>
+    </main>
   );
 }

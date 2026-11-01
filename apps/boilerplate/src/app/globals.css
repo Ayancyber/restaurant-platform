@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* Theme colors (overridable by restaurant.config.json) */
+  /* Brand colors: overridable through restaurant.config.json */
   --primary: #c2410c;
   --primary-foreground: #ffffff;
   --accent: #facc15;
@@ -9,17 +9,18 @@
   --radius: 0.5rem;
   --ring: var(--primary);
 
-  /* Dark mode is the only mode — site is always dark */
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-  --muted: #18181b;
-  --muted-foreground: #a1a1aa;
-  --border: #27272a;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --input: #27272a;
+  /* Light design system */
+  color-scheme: light;
+  --background: #faf8f4;
+  --foreground: #292524;
+  --muted: #f1eee8;
+  --muted-foreground: #78716c;
+  --border: #e7e2d9;
+  --card: #ffffff;
+  --card-foreground: #292524;
+  --popover: #ffffff;
+  --popover-foreground: #292524;
+  --input: #e7e2d9;
 }
 
 @theme inline {
@@ -56,7 +57,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading), Georgia, serif;
 }
 
@@ -226,9 +232,9 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(10px);
   }
   to {
-  opacity: 1;
-  transform: translateY(0);
-}
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .page-enter {

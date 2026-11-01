@@ -16,6 +16,7 @@ export function BrandStep() {
   const { data, updateData, _hasHydrated } = useWizardStore();
   const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -30,6 +31,7 @@ export function BrandStep() {
       tagline: "",
       heroPunchline: "",
       logoDataUrl: "",
+      faviconDataUrl: "",
     },
     mode: "onChange",
   });
@@ -48,6 +50,7 @@ export function BrandStep() {
       tagline: data.brand.tagline,
       heroPunchline: data.brand.heroPunchline,
       logoDataUrl: data.brand.logoDataUrl,
+      faviconDataUrl: data.brand.faviconDataUrl,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [_hasHydrated]);
@@ -57,6 +60,7 @@ export function BrandStep() {
   const watchedTagline = watch("tagline");
   const watchedPunchline = watch("heroPunchline");
   const watchedLogo = watch("logoDataUrl");
+  const watchedFavicon = watch("faviconDataUrl");
 
   // Sync to store whenever form values change (reads everything from form)
   useEffect(() => {
@@ -66,6 +70,7 @@ export function BrandStep() {
         tagline: values.tagline || "",
         heroPunchline: values.heroPunchline || "",
         logoDataUrl: values.logoDataUrl || "",
+        faviconDataUrl: values.faviconDataUrl || "",
       });
     });
     return () => subscription.unsubscribe();
@@ -247,6 +252,101 @@ export function BrandStep() {
             </Button>
             <p className="text-xs text-muted-foreground">
               Max 2MB • PNG, JPG, or SVG recommended
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Browser Favicon</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {watchedFavicon ? (
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-lg border bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                  <img
+                    src={watchedFavicon}
+                    alt="Favicon preview"
+                    className="h-10 w-10 object-contain"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">Favicon uploaded</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This appears in browser tabs and bookmarks.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setValue("faviconDataUrl", "", {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                    if (faviconInputRef.current) faviconInputRef.current.value = "";
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <div className="h-16 w-16 rounded-lg border-2 border-dashed flex items-center justify-center shrink-0">
+                  <ImageIcon className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm">Using default favicon</p>
+                  <p className="text-xs mt-1">
+                    Upload a custom browser icon if you have one.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <input
+              ref={faviconInputRef}
+              type="file"
+              accept="image/png"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                if (file.type !== "image/png") {
+                  toast.error("Favicon must be a PNG image");
+                  e.target.value = "";
+                  return;
+                }
+
+                if (file.size > 1024 * 1024) {
+                  toast.error("Favicon must be under 1MB");
+                  e.target.value = "";
+                  return;
+                }
+
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setValue("faviconDataUrl", reader.result as string, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                };
+                reader.readAsDataURL(file);
+              }}
+              className="hidden"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => faviconInputRef.current?.click()}
+            >
+              <Upload className="h-4 w-4" />
+              {watchedFavicon ? "Replace Favicon" : "Upload Favicon"}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              PNG only • Max 1MB • Square image recommended (at least 64 × 64 px)
             </p>
           </CardContent>
         </Card>

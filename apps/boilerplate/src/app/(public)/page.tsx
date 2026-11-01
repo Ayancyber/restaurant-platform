@@ -1,7 +1,14 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Clock, MapPin, Phone, ChevronDown } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Clock,
+  MapPin,
+  Phone,
+  UtensilsCrossed,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
@@ -9,6 +16,12 @@ import { getBaseUrl } from "@/lib/site-url";
 import { Reveal } from "@/components/site/reveal";
 
 export const dynamic = "force-dynamic";
+
+const demoDishImages = [
+  "/images/demo/dish-pasta.jpg",
+  "/images/demo/dish-pizza.webp",
+  "/images/demo/dish-salad.webp",
+];
 
 export default async function Home() {
   const supabase = await createClient();
@@ -22,10 +35,10 @@ export default async function Home() {
     .eq("is_available", true)
     .limit(home.featured.limit);
 
-  const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+  });
   const todayHours = hours.find((h) => h.day === today);
-
-  // Structured data for Google rich results (hours, phone, etc. in search)
   const baseUrl = getBaseUrl();
 
   const openingHours = hours
@@ -61,109 +74,163 @@ export default async function Home() {
     openingHoursSpecification: openingHours,
   };
 
+  const hasFeaturedItems = Boolean(featuredItems?.length);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {home.sections.hero && (
-        <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-gradient-to-br from-primary/10 via-background to-accent/10">
-          {/* Ambient background blobs */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/15 blur-3xl animate-float"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -bottom-32 -right-16 h-[28rem] w-[28rem] rounded-full bg-accent/15 blur-3xl animate-float [animation-delay:2s]"
-          />
 
-          <div className="container relative mx-auto px-4 py-20 text-center">
-            <Badge
-              variant="secondary"
-              className="mb-6 text-sm animate-fade-in-up"
-            >
-              {home.hero.badge}
-            </Badge>
-            <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl animate-fade-in-up delay-150">
-              {brand.name}
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl animate-fade-in-up delay-300">
-              {brand.heroPunchline}
-            </p>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3 animate-fade-in-up delay-500">
-              <Button
-                asChild
-                size="lg"
-                className="gap-2 group transition-transform hover:scale-[1.03] active:scale-95"
-              >
-                <Link href={home.hero.primaryCta.href}>
-                  {home.hero.primaryCta.label}
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="transition-transform hover:scale-[1.03] active:scale-95"
-              >
-                <Link href={home.hero.secondaryCta.href}>
-                  {home.hero.secondaryCta.label}
-                </Link>
-              </Button>
+      {home.sections.hero && (
+        <section className="relative overflow-hidden bg-[#f7f4ed]">
+          <div className="mx-auto grid min-h-[720px] max-w-[1600px] items-center gap-10 px-5 pb-16 pt-12 sm:px-10 lg:min-h-[790px] lg:grid-cols-[0.92fr_1.08fr] lg:gap-4 lg:px-16 lg:py-16 xl:px-24">
+            <div className="relative z-10 order-2 flex flex-col items-start lg:order-1 lg:py-16">
+              <Reveal variant="fade-up">
+                <div className="mb-9 flex items-center gap-3">
+                  <span className="h-px w-10 bg-primary" />
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary sm:text-xs">
+                    {home.hero.badge}
+                  </span>
+                </div>
+              </Reveal>
+
+              <Reveal delay={100} variant="fade-up">
+                <p className="mb-3 font-heading text-lg italic text-[#927d68] sm:text-xl">
+                  Welcome to
+                </p>
+                <h1 className="max-w-[700px] font-heading text-[clamp(3.8rem,8vw,7.7rem)] font-medium leading-[0.88] tracking-[-0.065em] text-[#29251f]">
+                  {brand.name}
+                  <span className="ml-1 text-primary">.</span>
+                </h1>
+              </Reveal>
+
+              <Reveal delay={180} variant="fade-up">
+                <p className="mt-8 max-w-[390px] text-base leading-8 text-[#746b60] sm:text-lg">
+                  {brand.heroPunchline}
+                </p>
+              </Reveal>
+
+              <Reveal delay={260} variant="fade-up">
+                <div className="mt-9 flex flex-wrap items-center gap-3">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="h-12 rounded-none px-7 text-xs uppercase tracking-[0.13em] shadow-none"
+                  >
+                    <Link href={home.hero.primaryCta.href}>
+                      {home.hero.primaryCta.label}
+                      <ArrowUpRight className="ml-3 h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="outline"
+                    className="h-12 rounded-none border-[#c9bfb0] bg-transparent px-7 text-xs uppercase tracking-[0.13em] text-[#39332c] shadow-none hover:bg-[#eee8dd]"
+                  >
+                    <Link href={home.hero.secondaryCta.href}>
+                      {home.hero.secondaryCta.label}
+                    </Link>
+                  </Button>
+                </div>
+              </Reveal>
+
+              <Reveal delay={340} variant="fade-up">
+                <div className="mt-16 flex items-center gap-5 border-t border-[#ded6ca] pt-5">
+                  <span className="font-heading text-3xl italic text-primary">
+                    01
+                  </span>
+                  <span className="max-w-[190px] text-[10px] uppercase leading-5 tracking-[0.2em] text-[#8b8175]">
+                    A place for good food and good company
+                  </span>
+                </div>
+              </Reveal>
+            </div>
+
+            <div className="relative order-1 mx-auto w-full max-w-[680px] lg:order-2 lg:ml-auto lg:mr-0">
+              <Reveal variant="fade-right">
+                <div className="relative ml-auto h-[390px] w-[88%] overflow-hidden sm:h-[520px] lg:h-[660px] lg:w-[82%]">
+                  <Image
+                    src="/images/demo/hero-main.jpg"
+                    alt={`A selection of dishes from ${brand.name}`}
+                    fill
+                    priority
+                    unoptimized
+                    sizes="(max-width: 1024px) 88vw, 55vw"
+                    className="object-cover"
+                  />
+                </div>
+              </Reveal>
+
+              <Reveal delay={180} variant="fade-up">
+                <div className="absolute -bottom-9 left-0 h-[190px] w-[42%] overflow-hidden border-[7px] border-[#f7f4ed] sm:h-[260px] lg:-bottom-5 lg:left-[-2%] lg:h-[300px] lg:w-[43%]">
+                  <Image
+                    src="/images/demo/hero-detail.jpg"
+                    alt={`A close-up of food preparation at ${brand.name}`}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 1024px) 42vw, 25vw"
+                    className="object-cover"
+                  />
+                </div>
+              </Reveal>
+
+              <div className="absolute -right-1 top-8 hidden [writing-mode:vertical-rl] lg:block">
+                <span className="text-[9px] uppercase tracking-[0.35em] text-[#8e8171]">
+                  Made with passion · Served with love
+                </span>
+              </div>
+
+              <div className="absolute -bottom-12 right-[3%] hidden font-heading text-6xl italic text-primary/80 lg:block">
+                Made with care
+              </div>
             </div>
           </div>
 
-          {/* Scroll hint */}
-          <ChevronDown
-            aria-hidden
-            className="absolute bottom-6 left-1/2 h-5 w-5 -translate-x-1/2 text-muted-foreground animate-bounce-soft"
-          />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-[#ded6ca]" />
         </section>
       )}
 
       {home.sections.quickInfo && (
-        <section className="border-y bg-muted/30">
-          <div className="container mx-auto grid gap-6 px-4 py-8 sm:grid-cols-3">
-            <Reveal
-              variant="fade-left"
-              className="flex items-center gap-3"
-            >
-              <Clock className="h-5 w-5 shrink-0 text-primary" />
+        <section className="bg-[#f7f4ed]">
+          <div className="mx-auto grid max-w-[1440px] gap-7 px-5 py-9 sm:px-10 md:grid-cols-3 lg:px-16 xl:px-24">
+            <Reveal variant="fade-left" className="flex items-start gap-4">
+              <Clock className="mt-1 h-4 w-4 shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium">Today ({today})</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8d8173]">
+                  Today · {today}
+                </p>
+                <p className="mt-2 font-heading text-xl text-[#302a24]">
                   {todayHours?.closed
-                    ? "Closed"
-                    : `${todayHours?.open} – ${todayHours?.close}`}
+                    ? "Closed today"
+                    : `${todayHours?.open ?? "Hours unavailable"} – ${todayHours?.close ?? ""}`}
                 </p>
               </div>
             </Reveal>
-            <Reveal
-              delay={120}
-              className="flex items-center gap-3"
-            >
-              <MapPin className="h-5 w-5 shrink-0 text-primary" />
+
+            <Reveal delay={100} className="flex items-start gap-4 md:border-l md:border-[#ded6ca] md:pl-8">
+              <MapPin className="mt-1 h-4 w-4 shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium">Location</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8d8173]">
+                  Find us
+                </p>
+                <p className="mt-2 max-w-[280px] font-heading text-xl leading-snug text-[#302a24]">
                   {contact.address}
                 </p>
               </div>
             </Reveal>
-            <Reveal
-              variant="fade-right"
-              delay={240}
-              className="flex items-center gap-3"
-            >
-              <Phone className="h-5 w-5 shrink-0 text-primary" />
+
+            <Reveal delay={200} className="flex items-start gap-4 md:border-l md:border-[#ded6ca] md:pl-8">
+              <Phone className="mt-1 h-4 w-4 shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium">Call us</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8d8173]">
+                  Reservations & enquiries
+                </p>
                 <a
                   href={`tel:${contact.phone}`}
-                  className="text-sm text-muted-foreground hover:text-primary"
+                  className="mt-2 inline-block font-heading text-xl text-[#302a24] transition-colors hover:text-primary"
                 >
                   {contact.phone}
                 </a>
@@ -174,87 +241,169 @@ export default async function Home() {
       )}
 
       {home.sections.featured && (
-        <section className="container mx-auto px-4 py-20">
-          <Reveal className="mb-12 text-center">
-            <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              {home.featured.heading}
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              {home.featured.subheading}
-            </p>
-          </Reveal>
+        <section className="overflow-hidden bg-[#eee9df] py-24 sm:py-32">
+          <div className="mx-auto max-w-[1440px] px-5 sm:px-10 lg:px-16 xl:px-24">
+            <div className="mb-14 grid gap-8 md:grid-cols-[1fr_0.65fr] md:items-end lg:mb-20">
+              <Reveal variant="fade-up">
+                <p className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-primary">
+                  <span className="h-px w-9 bg-primary" />
+                  From our kitchen
+                </p>
+                <h2 className="max-w-[720px] font-heading text-5xl font-medium leading-[0.98] tracking-[-0.045em] text-[#29251f] sm:text-6xl lg:text-7xl">
+                  {home.featured.heading}
+                  <span className="text-primary">.</span>
+                </h2>
+              </Reveal>
 
-          {featuredItems && featuredItems.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredItems.map((item, i) => (
-                <Reveal
-                  key={item.id}
-                  delay={(i % 3) * 120}
-                  variant="zoom-in"
-                  className="h-full"
-                >
-                  <Card className="group h-full overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                    <div className="aspect-[4/3] overflow-hidden bg-muted flex items-center justify-center text-muted-foreground">
-                      {item.image_url ? (
-                        <img
-                          src={item.image_url}
-                          alt={item.name}
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
-                      ) : (
-                        <span className="text-sm">No image</span>
-                      )}
-                    </div>
-                    <CardContent className="p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="font-heading text-lg font-semibold">
-                          {item.name}
-                        </h3>
-                        <span className="whitespace-nowrap font-medium text-primary">
-                          {currency} {Number(item.price).toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                        {item.description}
-                      </p>
-                      {item.tags && item.tags.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {item.tags.map((tag: string) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Reveal>
-              ))}
+              <Reveal delay={120} variant="fade-up">
+                <p className="max-w-[330px] text-sm leading-7 text-[#776e62] md:ml-auto md:pb-2">
+                  {home.featured.subheading}
+                </p>
+              </Reveal>
             </div>
-          ) : (
-            <p className="text-center text-muted-foreground">
-              No featured items yet.
-            </p>
-          )}
 
-          <Reveal delay={200} className="mt-12 text-center">
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="group transition-transform hover:scale-[1.03] active:scale-95"
-            >
-              <Link href="/menu">
-                {home.featured.ctaLabel}
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
-          </Reveal>
+            {hasFeaturedItems ? (
+              <div className="grid gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-3 lg:gap-x-10">
+                {featuredItems!.map((item, index) => {
+                  const demoImage = demoDishImages[index % demoDishImages.length];
+                  const imageSrc = item.image_url || demoImage;
+                  const isLead = index === 0;
+
+                  return (
+                    <Reveal
+                      key={item.id}
+                      delay={(index % 3) * 100}
+                      variant="fade-up"
+                      className={isLead ? "md:row-span-2" : ""}
+                    >
+                      <article className="group h-full">
+                        <div
+                          className={`relative overflow-hidden bg-[#ded6ca] ${
+                            isLead
+                              ? "aspect-[4/5] md:aspect-[4/5]"
+                              : index % 2 === 0
+                                ? "aspect-[5/4]"
+                                : "aspect-[4/5]"
+                          }`}
+                        >
+                          <Image
+                            src={imageSrc}
+                            alt={item.name}
+                            fill
+                            unoptimized
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+                          />
+                          <span className="absolute left-4 top-4 bg-[#f7f4ed]/95 px-3 py-2 font-heading text-sm italic text-primary">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                        </div>
+
+                        <div className="border-b border-[#cfc5b7] pb-5 pt-5">
+                          <div className="flex items-start justify-between gap-4">
+                            <h3 className="font-heading text-2xl font-medium leading-tight text-[#302a24] sm:text-[1.7rem]">
+                              {item.name}
+                            </h3>
+                            <span className="shrink-0 pt-1 text-sm font-medium text-primary">
+                              {currency} {Number(item.price).toLocaleString()}
+                            </span>
+                          </div>
+                          {item.description && (
+                            <p className="mt-3 max-w-[420px] text-sm leading-6 text-[#776e62]">
+                              {item.description}
+                            </p>
+                          )}
+                          {item.tags && item.tags.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {item.tags.map((tag: string) => (
+                                <Badge
+                                  key={tag}
+                                  variant="secondary"
+                                  className="rounded-none border border-[#d5cabb] bg-transparent px-2.5 py-1 text-[9px] font-medium uppercase tracking-[0.12em] text-[#766b5e]"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </article>
+                    </Reveal>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="border-y border-[#cfc5b7] py-16 text-center">
+                <UtensilsCrossed className="mx-auto h-7 w-7 text-primary/70" />
+                <p className="mt-4 font-heading text-2xl text-[#302a24]">
+                  The menu is being prepared
+                </p>
+                <p className="mt-2 text-sm text-[#776e62]">
+                  No featured items yet.
+                </p>
+              </div>
+            )}
+
+            <Reveal delay={150} className="mt-14 flex justify-center">
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="h-12 rounded-none border-[#a99a88] bg-transparent px-8 text-xs uppercase tracking-[0.16em] text-[#39332c] hover:bg-[#e3dccf]"
+              >
+                <Link href="/menu">
+                  {home.featured.ctaLabel}
+                  <ArrowRight className="ml-4 h-4 w-4" />
+                </Link>
+              </Button>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
+      {home.sections.hero && settings.features.reservations && (
+        <section className="relative overflow-hidden bg-[#29251f] text-[#f7f4ed]">
+          <div className="mx-auto grid max-w-[1600px] lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="relative min-h-[390px] lg:min-h-[570px]">
+              <Image
+                src="/images/demo/restaurant-interior.webp"
+                alt="Warm and welcoming restaurant dining room"
+                fill
+                unoptimized
+                sizes="(max-width: 1024px) 100vw, 52vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
+              <span className="absolute bottom-7 left-7 text-[10px] uppercase tracking-[0.25em] text-white/85 sm:bottom-10 sm:left-10">
+                A welcoming space for your next visit
+              </span>
+            </div>
+
+            <div className="flex flex-col justify-center px-7 py-16 sm:px-12 lg:px-16 xl:px-24">
+              <Reveal variant="fade-up">
+                <p className="mb-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#d5a17e]">
+                  <span className="h-px w-9 bg-[#d5a17e]" />
+                  Plan your next visit
+                </p>
+                <h2 className="max-w-[560px] font-heading text-5xl font-medium leading-[1.02] tracking-[-0.04em] sm:text-6xl">
+                  Good food deserves <span className="italic text-[#d5a17e]">good company.</span>
+                </h2>
+                <p className="mt-7 max-w-[390px] text-sm leading-7 text-white/60">
+                  Join us for a relaxed meal, thoughtful hospitality and time well spent. We look forward to welcoming you.
+                </p>
+                <Button
+                  asChild
+                  size="lg"
+                  className="mt-9 h-12 w-fit rounded-none bg-[#f0e9dc] px-7 text-xs uppercase tracking-[0.15em] text-[#29251f] shadow-none hover:bg-white"
+                >
+                  <Link href={home.hero.secondaryCta.href}>
+                    {home.hero.secondaryCta.label}
+                    <ArrowUpRight className="ml-4 h-4 w-4" />
+                  </Link>
+                </Button>
+              </Reveal>
+            </div>
+          </div>
         </section>
       )}
     </>

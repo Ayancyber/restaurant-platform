@@ -29,55 +29,55 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
   const mostRecent = hasRecent ? recentOrders[0] : null;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
+    <header className="sticky top-0 z-40 w-full border-b border-[#e8e0d5] bg-[#faf8f4]/95 backdrop-blur-xl">
+      <div className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between gap-5 px-5 sm:px-8 lg:px-12">
+        <Link href="/" className="group flex shrink-0 items-center gap-3">
           {brand.logoUrl && brand.logoUrl !== "/logo.svg" ? (
             <img
               src={brand.logoUrl}
               alt={brand.name}
-              className="h-9 w-auto max-w-[140px] object-contain"
+              className="h-10 w-auto max-w-[140px] object-contain"
             />
           ) : (
-            <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#c9a98a]/60 bg-[#efe7dc] font-heading text-xl text-[#8b4b32]">
               {brand.name.charAt(0)}
             </div>
           )}
-          <span className="font-heading text-xl font-semibold tracking-tight">
+          <span className="font-heading text-xl font-semibold tracking-tight text-[#30251f] transition-colors group-hover:text-[#9a5639] sm:text-2xl">
             {brand.name}
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden items-center gap-7 lg:flex xl:gap-9">
           {nav.links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="group relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="group relative py-2 text-[12px] font-medium uppercase tracking-[0.13em] text-[#75685e] transition-colors hover:text-[#9a5639]"
             >
               {link.label}
-              <span className="absolute left-0 -bottom-1 h-0.5 w-0 rounded-full bg-primary transition-all duration-300 group-hover:w-full" />
+              <span className="absolute bottom-0 left-0 h-px w-0 bg-[#a65e40] transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
           <Link
             href="/track-order"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5 relative"
+            className="relative inline-flex items-center gap-2 py-2 text-[12px] font-medium uppercase tracking-[0.13em] text-[#75685e] transition-colors hover:text-[#9a5639]"
           >
             <Package className="h-3.5 w-3.5" />
-            Track Order
+            Track order
             {hasRecent && (
-              <span className="h-1.5 w-1.5 rounded-full bg-primary absolute -top-0.5 -right-2" />
+              <span className="absolute -right-2 -top-0.5 h-1.5 w-1.5 rounded-full bg-[#a65e40]" />
             )}
           </Link>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-3">
           {nav.showPhone && (
             <a
               href={`tel:${contact.phone}`}
-              className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+              className="hidden items-center gap-2 border-r border-[#e3d9cd] pr-5 text-xs tracking-wide text-[#75685e] transition-colors hover:text-[#9a5639] xl:flex"
             >
-              <Phone className="h-4 w-4" />
+              <Phone className="h-3.5 w-3.5" />
               {contact.phone}
             </a>
           )}
@@ -85,7 +85,7 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
           <Button
             variant="default"
             size="sm"
-            className="gap-2 relative transition-transform active:scale-95"
+            className="relative h-10 gap-2 rounded-none bg-[#8f4932] px-4 text-[11px] font-medium uppercase tracking-[0.12em] text-white shadow-none transition-colors hover:bg-[#713923] active:scale-[0.98] sm:px-5"
             onClick={openCart}
           >
             <ShoppingCart className="h-4 w-4" />
@@ -93,7 +93,7 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
             {mounted && itemCount > 0 && (
               <span
                 key={itemCount}
-                className="absolute -top-2 -right-2 h-5 min-w-5 px-1 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-medium animate-zoom-in-soft"
+                className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d9b77e] px-1 text-[10px] font-semibold text-[#30251f] animate-zoom-in-soft"
               >
                 {itemCount}
               </span>
@@ -102,51 +102,71 @@ export function Navbar({ settings }: { settings: RestaurantConfig }) {
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 text-[#30251f] hover:bg-[#eee7dd] lg:hidden"
+                aria-label="Open navigation menu"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <SheetHeader>
-                <SheetTitle>{brand.name}</SheetTitle>
+            <SheetContent
+              side="right"
+              className="w-[min(88vw,400px)] border-l border-[#e5d9ca] bg-[#faf8f4] px-0 text-[#30251f]"
+            >
+              <SheetHeader className="border-b border-[#e8e0d5] px-7 pb-6 pt-8 text-left">
+                <span className="text-[10px] uppercase tracking-[0.24em] text-[#a16b4e]">
+                  Explore
+                </span>
+                <SheetTitle className="font-heading text-3xl font-medium text-[#30251f]">
+                  {brand.name}
+                </SheetTitle>
               </SheetHeader>
-              <nav className="mt-6 flex flex-col gap-1 px-2">
-                {nav.links.map((link) => (
+
+              <nav className="flex flex-col px-7 pt-5">
+                {nav.links.map((link, index) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="text-base font-medium hover:text-primary hover:bg-muted rounded-md px-3 py-2.5 transition-colors"
+                    className="flex items-center justify-between border-b border-[#e8e0d5] py-4 font-heading text-xl text-[#40342b] transition-colors hover:text-[#9a5639]"
                   >
-                    {link.label}
+                    <span>{link.label}</span>
+                    <span className="text-[10px] font-sans tracking-widest text-[#ad9b89]">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
                   </Link>
                 ))}
+
                 <Link
                   href="/track-order"
                   onClick={() => setOpen(false)}
-                  className="text-base font-medium hover:text-primary hover:bg-muted rounded-md px-3 py-2.5 transition-colors flex items-center gap-2 relative"
+                  className="flex items-center gap-3 border-b border-[#e8e0d5] py-4 text-sm text-[#62564c] transition-colors hover:text-[#9a5639]"
                 >
                   <Package className="h-4 w-4" />
-                  Track Order
+                  Track your order
                   {hasRecent && (
-                    <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-auto">
-                      {recentOrders.length}
+                    <span className="ml-auto rounded-full bg-[#efe5d8] px-2 py-1 text-[10px] text-[#8f4932]">
+                      {recentOrders.length} recent
                     </span>
                   )}
                 </Link>
+
                 {hasRecent && mostRecent && (
                   <Link
                     href={`/orders/${mostRecent.orderNumber}`}
                     onClick={() => setOpen(false)}
-                    className="text-xs text-muted-foreground hover:text-primary rounded-md px-3 py-2 transition-colors -mt-1 ml-6"
+                    className="py-3 pl-7 text-xs text-[#8b7b6d] transition-colors hover:text-[#9a5639]"
                   >
-                    ↳ Recent: {mostRecent.orderNumber}
+                    Recent order · {mostRecent.orderNumber}
                   </Link>
                 )}
+
                 {nav.showPhone && (
                   <a
                     href={`tel:${contact.phone}`}
-                    className="flex items-center gap-2 text-base font-medium mt-4 px-3 py-2.5 hover:bg-muted rounded-md transition-colors"
+                    className="mt-7 flex items-center gap-3 text-sm text-[#62564c] transition-colors hover:text-[#9a5639]"
                   >
                     <Phone className="h-4 w-4" />
                     {contact.phone}

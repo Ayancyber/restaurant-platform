@@ -4,7 +4,7 @@
     "tagline": "Authentic Italian Since 1987",
     "heroPunchline": "Where every meal feels like home.",
     "logoUrl": "/logo.svg",
-    "faviconUrl": "/favicon.ico"
+    "faviconUrl": "/favicon.svg"
   },
   "theme": {
     "primaryColor": "#c2410c",
@@ -15,11 +15,26 @@
   },
   "nav": {
     "links": [
-      { "href": "/", "label": "Home" },
-      { "href": "/menu", "label": "Menu" },
-      { "href": "/reservations", "label": "Reservations" },
-      { "href": "/gallery", "label": "Gallery" },
-      { "href": "/contact", "label": "Contact" }
+      {
+        "href": "/",
+        "label": "Home"
+      },
+      {
+        "href": "/menu",
+        "label": "Menu"
+      },
+      {
+        "href": "/reservations",
+        "label": "Reservations"
+      },
+      {
+        "href": "/gallery",
+        "label": "Gallery"
+      },
+      {
+        "href": "/contact",
+        "label": "Contact"
+      }
     ],
     "ctaLabel": "Cart",
     "ctaHref": "/cart",
@@ -33,8 +48,14 @@
     },
     "hero": {
       "badge": "Authentic Italian Since 1987",
-      "primaryCta": { "label": "View Menu", "href": "/menu" },
-      "secondaryCta": { "label": "Book a Table", "href": "/reservations" }
+      "primaryCta": {
+        "label": "View Menu",
+        "href": "/menu"
+      },
+      "secondaryCta": {
+        "label": "Book a Table",
+        "href": "/reservations"
+      }
     },
     "featured": {
       "heading": "Featured Dishes",
@@ -59,13 +80,48 @@
     "mapEmbedUrl": ""
   },
   "hours": [
-    { "day": "Monday",    "open": "11:00", "close": "22:00", "closed": false },
-    { "day": "Tuesday",   "open": "11:00", "close": "22:00", "closed": false },
-    { "day": "Wednesday", "open": "11:00", "close": "22:00", "closed": false },
-    { "day": "Thursday",  "open": "11:00", "close": "22:00", "closed": false },
-    { "day": "Friday",    "open": "11:00", "close": "23:30", "closed": false },
-    { "day": "Saturday",  "open": "10:00", "close": "23:30", "closed": false },
-    { "day": "Sunday",    "open": "10:00", "close": "21:00", "closed": false }
+    {
+      "day": "Monday",
+      "open": "11:00",
+      "close": "22:00",
+      "closed": false
+    },
+    {
+      "day": "Tuesday",
+      "open": "11:00",
+      "close": "22:00",
+      "closed": false
+    },
+    {
+      "day": "Wednesday",
+      "open": "11:00",
+      "close": "22:00",
+      "closed": false
+    },
+    {
+      "day": "Thursday",
+      "open": "11:00",
+      "close": "22:00",
+      "closed": false
+    },
+    {
+      "day": "Friday",
+      "open": "11:00",
+      "close": "23:30",
+      "closed": false
+    },
+    {
+      "day": "Saturday",
+      "open": "10:00",
+      "close": "23:30",
+      "closed": false
+    },
+    {
+      "day": "Sunday",
+      "open": "10:00",
+      "close": "21:00",
+      "closed": false
+    }
   ],
   "features": {
     "onlineOrdering": true,
@@ -77,7 +133,11 @@
   "currency": "PKR",
   "payment": {
     "provider": "pk-local",
-    "methods": ["jazzcash", "easypaisa", "cod"],
+    "methods": [
+      "jazzcash",
+      "easypaisa",
+      "cod"
+    ],
     "codEnabled": true,
     "deliveryFee": 150
   },
@@ -107,13 +167,17 @@
     "number": "+92 300 1234567"
   },
   "social": {
-    "instagram": "https://instagram.com/bellacucina",
-    "facebook": "https://facebook.com/bellacucina",
+    "instagram": "",
+    "facebook": "",
     "tiktok": ""
   },
   "seo": {
     "title": "Bella Cucina — Authentic Italian Restaurant",
     "description": "Family-owned Italian restaurant serving handmade pasta.",
-    "keywords": ["italian", "restaurant", "pasta"]
+    "keywords": [
+      "italian",
+      "restaurant",
+      "pasta"
+    ]
   }
 }

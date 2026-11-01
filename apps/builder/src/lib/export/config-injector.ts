@@ -7,17 +7,14 @@ import type { WizardData } from "@/lib/store/wizard-store";
 export function buildRestaurantConfig(data: WizardData) {
   return {
     brand: (() => {
-      // Detect the logo extension from the data URL, so we can write
-      // a real file path instead of an inline base64 string.
+      // Detect the uploaded logo's real image format.
       let logoPath = "/logo.svg";
-      if (
-        data.brand.logoDataUrl &&
-        data.brand.logoDataUrl.startsWith("data:")
-      ) {
+      if (data.brand.logoDataUrl?.startsWith("data:")) {
         const m = data.brand.logoDataUrl.match(
-          /^data:image\/(\w+);base64,/
+          /^data:image\/([a-z0-9.+-]+);base64,/i
         );
-        const ext = m && m[1] === "jpeg" ? "jpg" : m ? m[1] : "png";
+        const rawExt = m ? m[1].toLowerCase() : "png";
+        const ext = rawExt === "jpeg" ? "jpg" : rawExt === "svg+xml" ? "svg" : rawExt;
         logoPath = `/logo.${ext}`;
       }
       return {
@@ -25,7 +22,7 @@ export function buildRestaurantConfig(data: WizardData) {
         tagline: data.brand.tagline || "",
         heroPunchline: data.brand.heroPunchline || "",
         logoUrl: logoPath,
-        faviconUrl: "/favicon.ico",
+        faviconUrl: data.brand.faviconDataUrl ? "/favicon.png" : "/favicon.svg",
       };
     })(),
     theme: {
@@ -126,8 +123,8 @@ export function buildRestaurantConfig(data: WizardData) {
       number: data.whatsapp.number,
     },
     social: {
-      instagram: "",
-      facebook: "",
+      instagram: data.contact.instagram,
+      facebook: data.contact.facebook,
       tiktok: "",
     },
     seo: {

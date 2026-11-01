@@ -8,6 +8,16 @@ export const contactSchema = z.object({
     .or(z.literal(""))
     .optional(),
   address: z.string().min(5, "Address is required"),
+  instagram: z
+    .string()
+    .url("Enter a valid Instagram URL")
+    .or(z.literal(""))
+    .optional(),
+  facebook: z
+    .string()
+    .url("Enter a valid Facebook URL")
+    .or(z.literal(""))
+    .optional(),
   hours: z
     .array(
       z.object({

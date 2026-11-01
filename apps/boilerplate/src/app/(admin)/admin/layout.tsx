@@ -1,6 +1,17 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
 import { AdminShell } from "./admin-shell";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+
+  return {
+    title: `${settings.brand.name} Admin`,
+  };
+}
+
 
 export default async function AdminLayout({
   children,
@@ -28,9 +39,13 @@ export default async function AdminLayout({
     redirect("/login");
   }
 
+  const settings = await getSettings();
+
   return (
     <AdminShell
       userName={profile.full_name || profile.email || "Admin"}
+      brandName={settings.brand.name}
+      brandLogoUrl={settings.brand.logoUrl}
     >
       {children}
     </AdminShell>

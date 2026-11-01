@@ -213,120 +213,165 @@ export function MenuAdminClient({
   );
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between flex-wrap gap-3">
+    <div className="space-y-8">
+      <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 border-b border-border/70 pb-7">
         <div>
-          <h1 className="font-heading text-3xl font-bold">Menu Items</h1>
-          <p className="text-muted-foreground mt-1">
-            {items.length} items across {categories.length} categories
+          <p className="text-xs uppercase tracking-[0.22em] text-primary font-semibold mb-3">
+            Menu management
+          </p>
+          <h1 className="font-heading text-4xl sm:text-5xl font-semibold tracking-tight">
+            Menu items<span className="text-primary">.</span>
+          </h1>
+          <p className="text-muted-foreground mt-3">
+            Manage dishes, pricing and what guests see on your menu.
           </p>
         </div>
-        <Button onClick={openNew} className="gap-2">
+        <Button onClick={openNew} className="gap-2 rounded-full px-5 h-11">
           <Plus className="h-4 w-4" />
-          Add Item
+          Add item
         </Button>
       </header>
 
+      <div className="grid grid-cols-2 lg:grid-cols-4 border-y border-border/70">
+        {[
+          { label: "Total items", value: items.length },
+          { label: "Available", value: items.filter((item) => item.is_available).length },
+          { label: "Featured", value: items.filter((item) => item.is_featured).length },
+          { label: "Categories", value: categories.length },
+        ].map((stat, index) => (
+          <div
+            key={stat.label}
+            className={`py-5 px-4 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b lg:border-b-0" : ""} ${index === 2 ? "lg:border-l" : ""} border-border/70`}
+          >
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              {stat.label}
+            </p>
+            <p className="font-heading text-3xl mt-2 tabular-nums">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="font-heading text-2xl">Your menu</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {items.length} {items.length === 1 ? "dish" : "dishes"} in your collection
+          </p>
+        </div>
+        <span className="text-xs uppercase tracking-widest text-muted-foreground">
+          Sorted by display order
+        </span>
+      </div>
+
       {items.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center text-muted-foreground">
-            No menu items yet. Click "Add Item" to create one.
+        <Card className="border-dashed shadow-none">
+          <CardContent className="py-20 text-center">
+            <ImageOff className="h-8 w-8 mx-auto text-muted-foreground/60 mb-4" />
+            <h3 className="font-heading text-xl">A menu waiting to be written.</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              Add your first dish to start building the menu.
+            </p>
+            <Button onClick={openNew} className="mt-6 rounded-full gap-2">
+              <Plus className="h-4 w-4" /> Add your first item
+            </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
-          {items.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
-                {/* Thumbnail */}
-                <div className="w-16 h-16 rounded-md bg-muted flex items-center justify-center overflow-hidden shrink-0">
+        <div className="divide-y divide-border/70 border-y border-border/70">
+          {items.map((item, index) => (
+            <div
+              key={item.id}
+              className="group flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 py-5"
+            >
+              <div className="flex items-center gap-4 min-w-0 flex-1">
+                <span className="hidden sm:block text-xs tabular-nums text-muted-foreground/60 w-5">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-muted/60 overflow-hidden shrink-0">
                   {item.image_url ? (
                     <img
                       src={item.image_url}
                       alt={item.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <ImageOff className="h-5 w-5 text-muted-foreground" />
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageOff className="h-6 w-6 text-muted-foreground/50" />
+                    </div>
                   )}
                 </div>
 
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-medium">{item.name}</h3>
+                    <h3 className="font-heading text-xl sm:text-2xl leading-tight">
+                      {item.name}
+                    </h3>
                     {item.is_featured && (
-                      <Badge variant="secondary" className="text-xs gap-1">
+                      <Badge variant="secondary" className="rounded-full text-[10px] uppercase tracking-wider gap-1">
                         <Star className="h-3 w-3" /> Featured
                       </Badge>
                     )}
-                    {!item.is_available && (
-                      <Badge variant="destructive" className="text-xs">
-                        Unavailable
-                      </Badge>
-                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {categoriesById[item.category_id] ?? "Unknown"}
-                    {item.tags && item.tags.length > 0 && (
-                      <>
-                        {" • "}
-                        {item.tags.join(", ")}
-                      </>
-                    )}
+                  <p className="text-xs uppercase tracking-[0.13em] text-primary mt-2">
+                    {categoriesById[item.category_id] ?? "Uncategorised"}
                   </p>
                   {item.description && (
-                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2 max-w-2xl">
                       {item.description}
                     </p>
                   )}
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="font-medium text-primary whitespace-nowrap">
-                    {currency} {Number(item.price).toLocaleString()}
-                  </span>
-
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    title={item.is_available ? "Mark unavailable" : "Mark available"}
-                    onClick={() =>
-                      toggleField(item.id, "is_available", !item.is_available)
-                    }
-                  >
-                    {item.is_available ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
+                    {item.tags?.map((tag) => (
+                      <span key={tag} className="text-xs text-muted-foreground">
+                        #{tag}
+                      </span>
+                    ))}
+                    {!item.is_available && (
+                      <span className="text-[10px] uppercase tracking-wider text-destructive font-semibold">
+                        Currently unavailable
+                      </span>
                     )}
-                  </Button>
+                  </div>
+                </div>
+              </div>
 
+              <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 pl-0 sm:pl-4">
+                <span className="font-heading text-xl sm:text-2xl whitespace-nowrap tabular-nums">
+                  {currency} {Number(item.price).toLocaleString()}
+                </span>
+                <div className="flex items-center gap-1 border-l border-border/70 pl-3 ml-1">
                   <Button
                     size="icon"
                     variant="ghost"
-                    title={item.is_featured ? "Unfeature" : "Feature"}
-                    onClick={() =>
-                      toggleField(item.id, "is_featured", !item.is_featured)
-                    }
+                    className="rounded-full"
+                    title={item.is_available ? "Mark unavailable" : "Mark available"}
+                    onClick={() => toggleField(item.id, "is_available", !item.is_available)}
                   >
-                    <Star
-                      className={`h-4 w-4 ${
-                        item.is_featured ? "fill-yellow-500 text-yellow-500" : ""
-                      }`}
-                    />
+                    {item.is_available ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </Button>
-
                   <Button
                     size="icon"
                     variant="ghost"
+                    className="rounded-full"
+                    title={item.is_featured ? "Unfeature" : "Feature"}
+                    onClick={() => toggleField(item.id, "is_featured", !item.is_featured)}
+                  >
+                    <Star className={`h-4 w-4 ${item.is_featured ? "fill-yellow-500 text-yellow-500" : ""}`} />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full"
+                    title="Edit item"
                     onClick={() => openEdit(item)}
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
-
                   <Button
                     size="icon"
                     variant="ghost"
+                    className="rounded-full"
+                    title="Delete item"
                     onClick={() => handleDelete(item.id)}
                     disabled={deletingId === item.id}
                   >
@@ -337,39 +382,39 @@ export function MenuAdminClient({
                     )}
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto rounded-xl">
           <DialogHeader>
-            <DialogTitle>
-              {editing ? "Edit Menu Item" : "Add Menu Item"}
+            <p className="text-xs uppercase tracking-[0.18em] text-primary font-semibold">
+              Menu management
+            </p>
+            <DialogTitle className="font-heading text-2xl">
+              {editing ? "Edit menu item" : "Add a menu item"}
             </DialogTitle>
-            <DialogDescription>Fill in the details below.</DialogDescription>
+            <DialogDescription>
+              Add the details guests will see when browsing your menu.
+            </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Image upload */}
-            <div className="space-y-2">
-              <Label>Image</Label>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-3">
+              <Label>Dish photography</Label>
               {previewUrl ? (
-                <div className="relative aspect-video rounded-md overflow-hidden bg-muted">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
-                  />
+                <div className="relative aspect-[16/9] rounded-lg overflow-hidden bg-muted">
+                  <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
                 </div>
               ) : (
-                <div className="aspect-video rounded-md border-2 border-dashed flex items-center justify-center text-muted-foreground">
-                  <ImageOff className="h-8 w-8" />
+                <div className="aspect-[16/9] rounded-lg border border-dashed flex flex-col items-center justify-center gap-2 text-muted-foreground bg-muted/20">
+                  <ImageOff className="h-7 w-7" />
+                  <span className="text-xs">No image selected</span>
                 </div>
               )}
-
               <label className="cursor-pointer block">
                 <input
                   type="file"
@@ -378,134 +423,74 @@ export function MenuAdminClient({
                   className="hidden"
                   disabled={uploading}
                 />
-                <div className="w-full h-10 inline-flex items-center justify-center gap-2 rounded-md border bg-background hover:bg-muted text-sm font-medium cursor-pointer">
+                <div className="w-full h-11 inline-flex items-center justify-center gap-2 rounded-full border border-border hover:bg-muted/60 text-sm font-medium">
                   {uploading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Uploading...
-                    </>
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Uploading...</>
                   ) : (
-                    <>
-                      <Upload className="h-4 w-4" />
-                      {previewUrl ? "Replace Image" : "Upload Image"}
-                    </>
+                    <><Upload className="h-4 w-4" /> {previewUrl ? "Replace image" : "Upload image"}</>
                   )}
                 </div>
               </label>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                name="name"
-                required
-                defaultValue={editing?.name ?? ""}
-              />
+              <Label htmlFor="name">Item name *</Label>
+              <Input id="name" name="name" required defaultValue={editing?.name ?? ""} />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category_id">Category *</Label>
-              <Select
-                name="category_id"
-                required
-                defaultValue={editing?.category_id ?? categories[0]?.id}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="category_id">Category *</Label>
+                <Select name="category_id" required defaultValue={editing?.category_id ?? categories[0]?.id}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="price">Price *</Label>
+                <Input id="price" name="price" type="number" step="0.01" min="0" required defaultValue={editing?.price ?? ""} />
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                rows={3}
-                defaultValue={editing?.description ?? ""}
-              />
+              <Textarea id="description" name="description" rows={3} defaultValue={editing?.description ?? ""} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Price *</Label>
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  required
-                  defaultValue={editing?.price ?? ""}
-                />
+                <Label htmlFor="tags">Tags</Label>
+                <Input id="tags" name="tags" placeholder="vegetarian, spicy" defaultValue={editing?.tags?.join(", ") ?? ""} />
+                <p className="text-xs text-muted-foreground">Separate tags with commas.</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sort_order">Sort Order</Label>
-                <Input
-                  id="sort_order"
-                  name="sort_order"
-                  type="number"
-                  defaultValue={editing?.sort_order ?? 0}
-                />
+                <Label htmlFor="sort_order">Display order</Label>
+                <Input id="sort_order" name="sort_order" type="number" defaultValue={editing?.sort_order ?? 0} />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="tags">Tags (comma-separated)</Label>
-              <Input
-                id="tags"
-                name="tags"
-                placeholder="vegetarian, spicy"
-                defaultValue={editing?.tags?.join(", ") ?? ""}
-              />
-            </div>
-
-            <div className="flex gap-6">
+            <div className="flex flex-wrap gap-x-6 gap-y-3 border-y border-border/70 py-4">
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="is_available"
-                  defaultChecked={editing?.is_available ?? true}
-                  className="rounded"
-                />
-                Available
+                <input type="checkbox" name="is_available" defaultChecked={editing?.is_available ?? true} className="rounded" />
+                Available to order
               </label>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="is_featured"
-                  defaultChecked={editing?.is_featured ?? false}
-                  className="rounded"
-                />
-                Featured
+                <input type="checkbox" name="is_featured" defaultChecked={editing?.is_featured ?? false} className="rounded" />
+                Featured item
               </label>
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => setDialogOpen(false)}
-                disabled={submitting}
-              >
+            <div className="flex gap-3 pt-1">
+              <Button type="button" variant="outline" className="flex-1 rounded-full" onClick={() => setDialogOpen(false)} disabled={submitting}>
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                className="flex-1 gap-2"
-                disabled={submitting || uploading}
-              >
+              <Button type="submit" className="flex-1 rounded-full gap-2" disabled={submitting || uploading}>
                 {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                {editing ? "Save Changes" : "Create Item"}
+                {editing ? "Save changes" : "Create item"}
               </Button>
             </div>
           </form>

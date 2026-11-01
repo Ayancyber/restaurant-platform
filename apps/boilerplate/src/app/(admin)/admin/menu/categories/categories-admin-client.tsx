@@ -13,8 +13,6 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -182,88 +180,159 @@ export function CategoriesAdminClient({
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center justify-between flex-wrap gap-3">
+    <div className="space-y-10">
+      <header className="flex flex-col justify-between gap-5 border-b border-border/70 pb-7 sm:flex-row sm:items-end">
         <div>
-          <h1 className="font-heading text-3xl font-bold">Categories</h1>
-          <p className="text-muted-foreground mt-1">
-            {categories.length} categor{categories.length === 1 ? "y" : "ies"} •
-            Order controls how they appear on the public menu
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+            Menu management / Structure
+          </p>
+          <h1 className="font-heading text-4xl font-medium tracking-tight sm:text-5xl">
+            Categories<span className="text-primary">.</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+            Organise your menu into clear sections. Their order determines how
+            guests discover your dishes.
           </p>
         </div>
-        <Button onClick={openNew} className="gap-2">
+
+        <Button onClick={openNew} className="h-11 gap-2 self-start px-5 sm:self-auto">
           <Plus className="h-4 w-4" />
-          Add Category
+          Add category
         </Button>
       </header>
 
+      <section className="grid grid-cols-2 gap-4 border-b border-border/70 pb-7 sm:grid-cols-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Total categories
+          </p>
+          <p className="mt-2 font-heading text-3xl tabular-nums">
+            {String(categories.length).padStart(2, "0")}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Visible on site
+          </p>
+          <p className="mt-2 font-heading text-3xl tabular-nums">
+            {String(categories.filter((cat) => cat.is_active).length).padStart(2, "0")}
+          </p>
+        </div>
+        <div className="col-span-2 sm:col-span-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Menu items assigned
+          </p>
+          <p className="mt-2 font-heading text-3xl tabular-nums">
+            {String(Object.values(itemCounts).reduce((sum, count) => sum + count, 0)).padStart(2, "0")}
+          </p>
+        </div>
+      </section>
+
       {categories.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center text-muted-foreground">
-            No categories yet. Click &quot;Add Category&quot; to create one.
-          </CardContent>
-        </Card>
+        <div className="border-y border-border/70 py-20 text-center">
+          <span className="font-heading text-5xl text-primary/40">01</span>
+          <h2 className="mt-5 font-heading text-2xl">A menu takes shape here.</h2>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
+            Create your first category to give your menu a clear structure.
+          </p>
+          <Button onClick={openNew} className="mt-6 gap-2">
+            <Plus className="h-4 w-4" />
+            Create first category
+          </Button>
+        </div>
       ) : (
-        <div className="space-y-3">
-          {categories.map((cat, idx) => {
-            const count = itemCounts[cat.id] ?? 0;
-            return (
-              <Card key={cat.id}>
-                <CardContent className="p-4 flex items-center gap-4">
-                  {/* Reorder */}
-                  <div className="flex flex-col gap-1 shrink-0">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6"
-                      onClick={() => move(cat, "up")}
-                      disabled={idx === 0 || updatingId === cat.id}
-                    >
-                      <ArrowUp className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6"
-                      onClick={() => move(cat, "down")}
-                      disabled={
-                        idx === categories.length - 1 || updatingId === cat.id
-                      }
-                    >
-                      <ArrowDown className="h-3 w-3" />
-                    </Button>
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Category order
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {categories.length} {categories.length === 1 ? "section" : "sections"}
+            </p>
+          </div>
+
+          <div className="divide-y divide-border/70 border-y border-border/70">
+            {categories.map((cat, idx) => {
+              const count = itemCounts[cat.id] ?? 0;
+              const busy = updatingId === cat.id;
+
+              return (
+                <article
+                  key={cat.id}
+                  className="group grid grid-cols-[42px_minmax(0,1fr)_auto] items-center gap-3 py-5 sm:grid-cols-[54px_minmax(0,1fr)_auto] sm:gap-5"
+                >
+                  <div className="font-heading text-2xl tabular-nums text-primary/65 sm:text-3xl">
+                    {String(idx + 1).padStart(2, "0")}
                   </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-medium">{cat.name}</h3>
-                      <Badge variant="secondary" className="text-xs">
-                        {count} item{count === 1 ? "" : "s"}
-                      </Badge>
-                      {!cat.is_active && (
-                        <Badge variant="destructive" className="text-xs">
-                          Hidden
-                        </Badge>
-                      )}
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                      <h2 className="truncate font-heading text-xl font-medium sm:text-2xl">
+                        {cat.name}
+                      </h2>
+                      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                        {count} {count === 1 ? "item" : "items"}
+                      </span>
                     </div>
-                    {cat.description && (
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
+
+                    {cat.description ? (
+                      <p className="mt-1.5 line-clamp-2 text-sm leading-5 text-muted-foreground">
                         {cat.description}
                       </p>
+                    ) : (
+                      <p className="mt-1.5 text-xs italic text-muted-foreground/65">
+                        No description added
+                      </p>
                     )}
+
+                    <div className="mt-2.5 flex items-center gap-2">
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          cat.is_active ? "bg-emerald-600" : "bg-muted-foreground/40"
+                        }`}
+                      />
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                        {cat.is_active ? "Visible on site" : "Hidden from site"}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="mr-1 flex flex-col sm:mr-2 sm:flex-row">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        onClick={() => move(cat, "up")}
+                        disabled={idx === 0 || busy}
+                        title="Move up"
+                        aria-label={`Move ${cat.name} up`}
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        onClick={() => move(cat, "down")}
+                        disabled={idx === categories.length - 1 || busy}
+                        title="Move down"
+                        aria-label={`Move ${cat.name} down`}
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+
                     <Button
                       size="icon"
                       variant="ghost"
+                      className="h-9 w-9"
                       title={cat.is_active ? "Hide from site" : "Show on site"}
+                      aria-label={cat.is_active ? `Hide ${cat.name}` : `Show ${cat.name}`}
                       onClick={() => toggleActive(cat)}
-                      disabled={updatingId === cat.id}
+                      disabled={busy}
                     >
-                      {updatingId === cat.id ? (
+                      {busy ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : cat.is_active ? (
                         <Eye className="h-4 w-4" />
@@ -275,7 +344,10 @@ export function CategoriesAdminClient({
                     <Button
                       size="icon"
                       variant="ghost"
+                      className="h-9 w-9"
                       onClick={() => openEdit(cat)}
+                      title="Edit category"
+                      aria-label={`Edit ${cat.name}`}
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -283,44 +355,55 @@ export function CategoriesAdminClient({
                     <Button
                       size="icon"
                       variant="ghost"
+                      className="h-9 w-9 text-destructive hover:text-destructive"
                       onClick={() => handleDelete(cat)}
                       disabled={deletingId === cat.id}
+                      title="Delete category"
+                      aria-label={`Delete ${cat.name}`}
                     >
                       {deletingId === cat.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Trash2 className="h-4 w-4" />
                       )}
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                </article>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Use the arrows to change the order in which categories appear on your public menu.
+          </p>
+        </section>
       )}
 
-      {/* Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md gap-6">
           <DialogHeader>
-            <DialogTitle>
-              {editing ? "Edit Category" : "Add Category"}
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
+              Menu structure
+            </p>
+            <DialogTitle className="font-heading text-2xl font-medium">
+              {editing ? "Refine category" : "Create a category"}
             </DialogTitle>
-            <DialogDescription>
-              Categories group menu items. Sort order controls display.
+            <DialogDescription className="text-sm leading-6">
+              {editing
+                ? "Update the details and presentation of this menu section."
+                : "Give your menu a new section for guests to explore."}
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name">Name *</Label>
+              <Label htmlFor="name">Category name *</Label>
               <Input
                 id="name"
                 name="name"
                 required
-                placeholder="Starters"
+                placeholder="e.g. Starters"
                 defaultValue={editing?.name ?? ""}
+                className="h-11"
               />
             </div>
 
@@ -329,52 +412,55 @@ export function CategoriesAdminClient({
               <Textarea
                 id="description"
                 name="description"
-                rows={2}
-                placeholder="Appetizers and small plates"
+                rows={3}
+                placeholder="A short introduction to this section..."
                 defaultValue={editing?.description ?? ""}
+                className="resize-none"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sort_order">Sort Order</Label>
+              <Label htmlFor="sort_order">Display order</Label>
               <Input
                 id="sort_order"
                 name="sort_order"
                 type="number"
                 defaultValue={editing?.sort_order ?? categories.length}
+                className="h-11"
               />
               <p className="text-xs text-muted-foreground">
-                Lower numbers appear first.
+                Lower numbers appear earlier on the public menu.
               </p>
             </div>
 
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-3 border-y border-border/70 py-4 text-sm">
               <input
                 type="checkbox"
                 name="is_active"
                 defaultChecked={editing?.is_active ?? true}
-                className="rounded"
+                className="h-4 w-4 rounded accent-primary"
               />
-              Show on public site
+              <span>
+                <span className="block font-medium">Show on public site</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">
+                  Make this category visible to your guests.
+                </span>
+              </span>
             </label>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-1">
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1"
+                className="h-11 flex-1"
                 onClick={() => setDialogOpen(false)}
                 disabled={submitting}
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                className="flex-1 gap-2"
-                disabled={submitting}
-              >
+              <Button type="submit" className="h-11 flex-1 gap-2" disabled={submitting}>
                 {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                {editing ? "Save Changes" : "Create Category"}
+                {editing ? "Save changes" : "Create category"}
               </Button>
             </div>
           </form>

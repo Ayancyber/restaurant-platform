@@ -8,6 +8,7 @@ const settingsSchema = z.object({
     name: z.string().min(1),
     tagline: z.string().optional(),
     heroPunchline: z.string().optional(),
+    logoUrl: z.string().optional(),
   }).optional(),
   contact: z.object({
     phone: z.string(),

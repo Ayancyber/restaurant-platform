@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Loader2,
@@ -27,6 +27,8 @@ import type { RestaurantConfig } from "@/config";
 export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const [brand, setBrand] = useState(initial.brand);
   const [contact, setContact] = useState(initial.contact);
@@ -41,6 +43,49 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
   const [uploadingQr, setUploadingQr] = useState<
     "jazzcash" | "easypaisa" | null
   >(null);
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      toast.error("Please choose a PNG, JPG, or WebP image");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Logo must be under 5MB");
+      e.target.value = "";
+      return;
+    }
+
+    setUploadingLogo(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        toast.error(result.error || "Logo upload failed");
+        return;
+      }
+
+      setBrand((prev) => ({ ...prev, logoUrl: result.url }));
+      toast.success("Logo uploaded. Save changes to publish it.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Logo upload error");
+    } finally {
+      setUploadingLogo(false);
+      if (logoInputRef.current) logoInputRef.current.value = "";
+    }
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -114,487 +159,357 @@ export function SettingsClient({ initial }: { initial: RestaurantConfig }) {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <header className="flex items-center justify-between flex-wrap gap-3">
+    <div className="space-y-8">
+      <header className="flex flex-col justify-between gap-5 border-b border-border/70 pb-7 sm:flex-row sm:items-end">
         <div>
-          <h1 className="font-heading text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-1">
-            Edit your restaurant's info — changes appear instantly on the site.
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+            Workspace / Configuration
+          </p>
+          <h1 className="font-heading text-4xl font-medium tracking-tight sm:text-5xl">
+            Settings<span className="text-primary">.</span>
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+            Shape the details behind your restaurant's online presence.
           </p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="gap-2">
-          {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          Save Changes
+        <Button onClick={handleSave} disabled={saving} className="h-11 gap-2 self-start px-5 sm:self-auto">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {saving ? "Saving..." : "Save changes"}
         </Button>
       </header>
 
-      <Tabs defaultValue="brand">
-        <TabsList className="grid grid-cols-3 w-full h-auto gap-1 md:flex md:w-auto md:justify-start">
-          <TabsTrigger value="brand" className="gap-2 justify-center md:justify-start">
-            <Store className="h-4 w-4" /> Brand
-          </TabsTrigger>
-          <TabsTrigger value="contact" className="gap-2 justify-center md:justify-start">
-            <Phone className="h-4 w-4" /> Contact
-          </TabsTrigger>
-          <TabsTrigger value="hours" className="gap-2 justify-center md:justify-start">
-            <Clock className="h-4 w-4" /> Hours
-          </TabsTrigger>
-          <TabsTrigger value="payments" className="gap-2 justify-center md:justify-start">
-            <CreditCard className="h-4 w-4" /> Payments
-          </TabsTrigger>
-          <TabsTrigger value="social" className="gap-2 justify-center md:justify-start">
-            <Share2 className="h-4 w-4" /> Social
-          </TabsTrigger>
-          <TabsTrigger value="seo" className="gap-2 justify-center md:justify-start">
-            <Search className="h-4 w-4" /> SEO
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="brand" className="grid gap-8 md:grid-cols-[190px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)]">
+        <div className="min-w-0">
+          <p className="mb-3 hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground md:block">
+            Configuration
+          </p>
+          <TabsList className="flex h-auto w-full justify-start gap-1 overflow-x-auto rounded-none bg-transparent p-0 md:flex-col md:items-stretch md:overflow-visible">
+            <TabsTrigger value="brand" className="h-10 shrink-0 justify-start gap-3 rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-muted/60 data-[state=active]:text-primary data-[state=active]:shadow-none md:w-full md:border-b-0 md:border-l-2 md:data-[state=active]:border-l-primary">
+              <Store className="h-4 w-4" /> Brand
+            </TabsTrigger>
+            <TabsTrigger value="contact" className="h-10 shrink-0 justify-start gap-3 rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-muted/60 data-[state=active]:text-primary data-[state=active]:shadow-none md:w-full md:border-b-0 md:border-l-2 md:data-[state=active]:border-l-primary">
+              <Phone className="h-4 w-4" /> Contact
+            </TabsTrigger>
+            <TabsTrigger value="hours" className="h-10 shrink-0 justify-start gap-3 rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-muted/60 data-[state=active]:text-primary data-[state=active]:shadow-none md:w-full md:border-b-0 md:border-l-2 md:data-[state=active]:border-l-primary">
+              <Clock className="h-4 w-4" /> Opening hours
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="h-10 shrink-0 justify-start gap-3 rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-muted/60 data-[state=active]:text-primary data-[state=active]:shadow-none md:w-full md:border-b-0 md:border-l-2 md:data-[state=active]:border-l-primary">
+              <CreditCard className="h-4 w-4" /> Payments
+            </TabsTrigger>
+            <TabsTrigger value="social" className="h-10 shrink-0 justify-start gap-3 rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-muted/60 data-[state=active]:text-primary data-[state=active]:shadow-none md:w-full md:border-b-0 md:border-l-2 md:data-[state=active]:border-l-primary">
+              <Share2 className="h-4 w-4" /> Social links
+            </TabsTrigger>
+            <TabsTrigger value="seo" className="h-10 shrink-0 justify-start gap-3 rounded-none border-b-2 border-transparent px-3 text-xs data-[state=active]:border-primary data-[state=active]:bg-muted/60 data-[state=active]:text-primary data-[state=active]:shadow-none md:w-full md:border-b-0 md:border-l-2 md:data-[state=active]:border-l-primary">
+              <Search className="h-4 w-4" /> SEO
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="brand">
-          <Card>
-            <CardHeader>
-              <CardTitle>Brand</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="mt-6 hidden border-t border-border/70 pt-5 md:block">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              A note
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              Remember to save your changes before leaving this page.
+            </p>
+          </div>
+        </div>
+
+        <div className="min-w-0">
+          <TabsContent value="brand" className="mt-0 space-y-6">
+            <section className="border-b border-border/70 pb-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">01 / Identity</p>
+              <h2 className="mt-2 font-heading text-2xl font-medium">Brand identity</h2>
+              <p className="mt-1 text-sm text-muted-foreground">The name and words guests see across your website.</p>
+            </section>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <Label>Restaurant logo</Label>
+                <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                  <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/30 p-2">
+                    {brand.logoUrl && brand.logoUrl !== "/logo.svg" ? (
+                      <img
+                        src={brand.logoUrl}
+                        alt="Restaurant logo preview"
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      <ImageOff className="h-7 w-7 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      disabled={uploadingLogo}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="gap-2"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                    >
+                      {uploadingLogo ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4" />
+                      )}
+                      {uploadingLogo ? "Uploading..." : brand.logoUrl && brand.logoUrl !== "/logo.svg" ? "Replace logo" : "Upload logo"}
+                    </Button>
+                    {brand.logoUrl && brand.logoUrl !== "/logo.svg" && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => setBrand((prev) => ({ ...prev, logoUrl: "/logo.svg" }))}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  PNG, JPG, or WebP • Max 5MB. Changes take effect after saving.
+                </p>
+              </div>
               <div className="space-y-2">
-                <Label htmlFor="name">Restaurant Name *</Label>
-                <Input
-                  id="name"
-                  value={brand.name}
-                  onChange={(e) => setBrand({ ...brand, name: e.target.value })}
-                />
+                <Label htmlFor="name">Restaurant name *</Label>
+                <Input id="name" value={brand.name} onChange={(e) => setBrand({ ...brand, name: e.target.value })} className="h-11" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="tagline">Tagline</Label>
-                <Input
-                  id="tagline"
-                  value={brand.tagline}
-                  onChange={(e) =>
-                    setBrand({ ...brand, tagline: e.target.value })
-                  }
-                />
+                <Input id="tagline" value={brand.tagline} onChange={(e) => setBrand({ ...brand, tagline: e.target.value })} className="h-11" />
+                <p className="text-xs text-muted-foreground">A short line that captures your restaurant's character.</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="heroPunchline">Hero Punchline</Label>
-                <Input
-                  id="heroPunchline"
-                  value={brand.heroPunchline}
-                  onChange={(e) =>
-                    setBrand({ ...brand, heroPunchline: e.target.value })
-                  }
-                />
+                <Label htmlFor="heroPunchline">Hero punchline</Label>
+                <Input id="heroPunchline" value={brand.heroPunchline} onChange={(e) => setBrand({ ...brand, heroPunchline: e.target.value })} className="h-11" />
+                <p className="text-xs text-muted-foreground">The prominent statement displayed in your homepage hero.</p>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="contact">
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <TabsContent value="contact" className="mt-0 space-y-6">
+            <section className="border-b border-border/70 pb-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">02 / Get in touch</p>
+              <h2 className="mt-2 font-heading text-2xl font-medium">Contact information</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Make it easy for guests to reach your restaurant.</p>
+            </section>
+            <div className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  value={contact.phone}
-                  onChange={(e) =>
-                    setContact({ ...contact, phone: e.target.value })
-                  }
-                />
+                <Label htmlFor="phone">Phone number</Label>
+                <Input id="phone" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className="h-11" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={contact.email}
-                  onChange={(e) =>
-                    setContact({ ...contact, email: e.target.value })
-                  }
-                />
+                <Label htmlFor="email">Email address</Label>
+                <Input id="email" type="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className="h-11" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Textarea
-                  id="address"
-                  rows={2}
-                  value={contact.address}
-                  onChange={(e) =>
-                    setContact({ ...contact, address: e.target.value })
-                  }
-                />
+                <Label htmlFor="address">Restaurant address</Label>
+                <Textarea id="address" rows={3} value={contact.address} onChange={(e) => setContact({ ...contact, address: e.target.value })} className="resize-y" />
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="hours">
-          <Card>
-            <CardHeader>
-              <CardTitle>Opening Hours</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <TabsContent value="hours" className="mt-0 space-y-6">
+            <section className="border-b border-border/70 pb-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">03 / Schedule</p>
+              <h2 className="mt-2 font-heading text-2xl font-medium">Opening hours</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Set the hours your guests can visit each day.</p>
+            </section>
+            <div className="space-y-0">
               {hours.map((h, i) => (
-                <div
-                  key={h.day}
-                  className="grid grid-cols-[100px_1fr_1fr_auto] gap-3 items-center"
-                >
+                <div key={h.day} className="grid grid-cols-1 gap-3 border-b border-border/70 py-4 sm:grid-cols-[minmax(100px,0.7fr)_1fr_1fr_auto] sm:items-center">
                   <span className="text-sm font-medium">{h.day}</span>
-                  <Input
-                    type="time"
-                    value={h.open}
-                    disabled={h.closed}
-                    onChange={(e) => updateHour(i, "open", e.target.value)}
-                  />
-                  <Input
-                    type="time"
-                    value={h.close}
-                    disabled={h.closed}
-                    onChange={(e) => updateHour(i, "close", e.target.value)}
-                  />
-                  <label className="flex items-center gap-2 text-xs cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={h.closed}
-                      onChange={(e) =>
-                        updateHour(i, "closed", e.target.checked)
-                      }
-                      className="rounded"
-                    />
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-normal text-muted-foreground">Opens</Label>
+                    <Input type="time" value={h.open} disabled={h.closed} onChange={(e) => updateHour(i, "open", e.target.value)} className="h-10" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px] font-normal text-muted-foreground">Closes</Label>
+                    <Input type="time" value={h.close} disabled={h.closed} onChange={(e) => updateHour(i, "close", e.target.value)} className="h-10" />
+                  </div>
+                  <label className="flex cursor-pointer items-center gap-2 pt-4 text-xs text-muted-foreground sm:pt-0">
+                    <input type="checkbox" checked={h.closed} onChange={(e) => updateHour(i, "closed", e.target.checked)} className="h-4 w-4 rounded accent-primary" />
                     Closed
                   </label>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </TabsContent>
 
-        {/* PAYMENTS — NEW */}
-        <TabsContent value="payments">
-          <div className="space-y-6">
-            {/* JazzCash */}
-            <Card>
-              <CardHeader>
-                <CardTitle>JazzCash Account</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={paymentAccounts.jazzcash.enabled}
-                    onChange={(e) =>
-                      setPaymentAccounts({
-                        ...paymentAccounts,
-                        jazzcash: {
-                          ...paymentAccounts.jazzcash,
-                          enabled: e.target.checked,
-                        },
-                      })
-                    }
-                    className="rounded"
-                  />
+          <TabsContent value="payments" className="mt-0 space-y-8">
+            <section className="border-b border-border/70 pb-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">04 / Checkout</p>
+              <h2 className="mt-2 font-heading text-2xl font-medium">Payment methods</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Manage mobile wallet details and payment proof instructions.</p>
+            </section>
+
+            <section className="space-y-5">
+              <div className="flex flex-col justify-between gap-3 border-b border-border/70 pb-4 sm:flex-row sm:items-center">
+                <div>
+                  <h3 className="font-heading text-xl">JazzCash</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">Mobile wallet payment details</p>
+                </div>
+                <label className="flex cursor-pointer items-center gap-2 text-sm">
+                  <input type="checkbox" checked={paymentAccounts.jazzcash.enabled} onChange={(e) => setPaymentAccounts({ ...paymentAccounts, jazzcash: { ...paymentAccounts.jazzcash, enabled: e.target.checked } })} className="h-4 w-4 rounded accent-primary" />
                   Accept JazzCash payments
                 </label>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Account Holder Name</Label>
-                    <Input
-                      value={paymentAccounts.jazzcash.accountName}
-                      onChange={(e) =>
-                        setPaymentAccounts({
-                          ...paymentAccounts,
-                          jazzcash: {
-                            ...paymentAccounts.jazzcash,
-                            accountName: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Muhammad Ayan"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Mobile Account Number</Label>
-                    <Input
-                      value={paymentAccounts.jazzcash.accountNumber}
-                      onChange={(e) =>
-                        setPaymentAccounts({
-                          ...paymentAccounts,
-                          jazzcash: {
-                            ...paymentAccounts.jazzcash,
-                            accountNumber: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="03001234567"
-                    />
-                  </div>
-                </div>
-
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>QR Code (optional)</Label>
-                  {paymentAccounts.jazzcash.qrCodeUrl ? (
-                    <div className="relative w-48 h-48 rounded-md overflow-hidden bg-muted">
-                      <img
-                        src={paymentAccounts.jazzcash.qrCodeUrl}
-                        alt="JazzCash QR"
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-48 h-48 rounded-md border-2 border-dashed flex items-center justify-center text-muted-foreground">
-                      <ImageOff className="h-8 w-8" />
-                    </div>
-                  )}
-                  <label className="cursor-pointer block">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleQrUpload(e, "jazzcash")}
-                      className="hidden"
-                      disabled={uploadingQr === "jazzcash"}
-                    />
-                    <div className="w-48 h-10 inline-flex items-center justify-center gap-2 rounded-md border bg-background hover:bg-muted text-sm font-medium cursor-pointer">
-                      {uploadingQr === "jazzcash" ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4" />
-                          {paymentAccounts.jazzcash.qrCodeUrl
-                            ? "Replace QR"
-                            : "Upload QR Code"}
-                        </>
-                      )}
-                    </div>
+                  <Label>Account holder name</Label>
+                  <Input value={paymentAccounts.jazzcash.accountName} onChange={(e) => setPaymentAccounts({ ...paymentAccounts, jazzcash: { ...paymentAccounts.jazzcash, accountName: e.target.value } })} className="h-11" placeholder="Account holder name" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Mobile account number</Label>
+                  <Input value={paymentAccounts.jazzcash.accountNumber} onChange={(e) => setPaymentAccounts({ ...paymentAccounts, jazzcash: { ...paymentAccounts.jazzcash, accountNumber: e.target.value } })} className="h-11" placeholder="03XXXXXXXXX" />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <Label>QR code (optional)</Label>
+                <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                  <div className="flex h-40 w-40 shrink-0 items-center justify-center overflow-hidden border border-border bg-muted/30">
+                    {paymentAccounts.jazzcash.qrCodeUrl ? (
+                      <img src={paymentAccounts.jazzcash.qrCodeUrl} alt="JazzCash QR" className="h-full w-full object-contain" />
+                    ) : (
+                      <div className="text-center text-muted-foreground">
+                        <ImageOff className="mx-auto h-7 w-7" strokeWidth={1.2} />
+                        <span className="mt-2 block text-[10px]">No QR uploaded</span>
+                      </div>
+                    )}
+                  </div>
+                  <label className="block cursor-pointer">
+                    <input type="file" accept="image/*" onChange={(e) => handleQrUpload(e, "jazzcash")} className="hidden" disabled={uploadingQr === "jazzcash"} />
+                    <span className="inline-flex h-10 items-center justify-center gap-2 border border-border px-4 text-xs font-medium transition-colors hover:bg-muted">
+                      {uploadingQr === "jazzcash" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      {uploadingQr === "jazzcash" ? "Uploading..." : paymentAccounts.jazzcash.qrCodeUrl ? "Replace QR code" : "Upload QR code"}
+                    </span>
                   </label>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </section>
 
-            {/* Easypaisa */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Easypaisa Account</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={paymentAccounts.easypaisa.enabled}
-                    onChange={(e) =>
-                      setPaymentAccounts({
-                        ...paymentAccounts,
-                        easypaisa: {
-                          ...paymentAccounts.easypaisa,
-                          enabled: e.target.checked,
-                        },
-                      })
-                    }
-                    className="rounded"
-                  />
+            <section className="space-y-5 border-t border-border/70 pt-7">
+              <div className="flex flex-col justify-between gap-3 border-b border-border/70 pb-4 sm:flex-row sm:items-center">
+                <div>
+                  <h3 className="font-heading text-xl">Easypaisa</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">Mobile wallet payment details</p>
+                </div>
+                <label className="flex cursor-pointer items-center gap-2 text-sm">
+                  <input type="checkbox" checked={paymentAccounts.easypaisa.enabled} onChange={(e) => setPaymentAccounts({ ...paymentAccounts, easypaisa: { ...paymentAccounts.easypaisa, enabled: e.target.checked } })} className="h-4 w-4 rounded accent-primary" />
                   Accept Easypaisa payments
                 </label>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Account Holder Name</Label>
-                    <Input
-                      value={paymentAccounts.easypaisa.accountName}
-                      onChange={(e) =>
-                        setPaymentAccounts({
-                          ...paymentAccounts,
-                          easypaisa: {
-                            ...paymentAccounts.easypaisa,
-                            accountName: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Mobile Account Number</Label>
-                    <Input
-                      value={paymentAccounts.easypaisa.accountNumber}
-                      onChange={(e) =>
-                        setPaymentAccounts({
-                          ...paymentAccounts,
-                          easypaisa: {
-                            ...paymentAccounts.easypaisa,
-                            accountNumber: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>QR Code (optional)</Label>
-                  {paymentAccounts.easypaisa.qrCodeUrl ? (
-                    <div className="relative w-48 h-48 rounded-md overflow-hidden bg-muted">
-                      <img
-                        src={paymentAccounts.easypaisa.qrCodeUrl}
-                        alt="Easypaisa QR"
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-48 h-48 rounded-md border-2 border-dashed flex items-center justify-center text-muted-foreground">
-                      <ImageOff className="h-8 w-8" />
-                    </div>
-                  )}
-                  <label className="cursor-pointer block">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleQrUpload(e, "easypaisa")}
-                      className="hidden"
-                      disabled={uploadingQr === "easypaisa"}
-                    />
-                    <div className="w-48 h-10 inline-flex items-center justify-center gap-2 rounded-md border bg-background hover:bg-muted text-sm font-medium cursor-pointer">
-                      {uploadingQr === "easypaisa" ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4" />
-                          {paymentAccounts.easypaisa.qrCodeUrl
-                            ? "Replace QR"
-                            : "Upload QR Code"}
-                        </>
-                      )}
-                    </div>
+                  <Label>Account holder name</Label>
+                  <Input value={paymentAccounts.easypaisa.accountName} onChange={(e) => setPaymentAccounts({ ...paymentAccounts, easypaisa: { ...paymentAccounts.easypaisa, accountName: e.target.value } })} className="h-11" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Mobile account number</Label>
+                  <Input value={paymentAccounts.easypaisa.accountNumber} onChange={(e) => setPaymentAccounts({ ...paymentAccounts, easypaisa: { ...paymentAccounts.easypaisa, accountNumber: e.target.value } })} className="h-11" />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <Label>QR code (optional)</Label>
+                <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                  <div className="flex h-40 w-40 shrink-0 items-center justify-center overflow-hidden border border-border bg-muted/30">
+                    {paymentAccounts.easypaisa.qrCodeUrl ? (
+                      <img src={paymentAccounts.easypaisa.qrCodeUrl} alt="Easypaisa QR" className="h-full w-full object-contain" />
+                    ) : (
+                      <div className="text-center text-muted-foreground">
+                        <ImageOff className="mx-auto h-7 w-7" strokeWidth={1.2} />
+                        <span className="mt-2 block text-[10px]">No QR uploaded</span>
+                      </div>
+                    )}
+                  </div>
+                  <label className="block cursor-pointer">
+                    <input type="file" accept="image/*" onChange={(e) => handleQrUpload(e, "easypaisa")} className="hidden" disabled={uploadingQr === "easypaisa"} />
+                    <span className="inline-flex h-10 items-center justify-center gap-2 border border-border px-4 text-xs font-medium transition-colors hover:bg-muted">
+                      {uploadingQr === "easypaisa" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      {uploadingQr === "easypaisa" ? "Uploading..." : paymentAccounts.easypaisa.qrCodeUrl ? "Replace QR code" : "Upload QR code"}
+                    </span>
                   </label>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </section>
 
-            {/* WhatsApp */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-primary" />
-                  WhatsApp for Payment Proof
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={whatsapp.enabled}
-                    onChange={(e) =>
-                      setWhatsapp({ ...whatsapp, enabled: e.target.checked })
-                    }
-                    className="rounded"
-                  />
-                  Send payment screenshots via WhatsApp
-                </label>
-                <div className="space-y-2">
-                  <Label>WhatsApp Number</Label>
-                  <Input
-                    value={whatsapp.number}
-                    onChange={(e) =>
-                      setWhatsapp({ ...whatsapp, number: e.target.value })
-                    }
-                    placeholder="+92 300 1234567"
-                  />
+            <section className="space-y-5 border-t border-border/70 pt-7">
+              <div className="flex items-center gap-3">
+                <MessageCircle className="h-5 w-5 text-primary" />
+                <div>
+                  <h3 className="font-heading text-xl">WhatsApp payment proof</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">Where customers send their payment screenshots.</p>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+              </div>
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input type="checkbox" checked={whatsapp.enabled} onChange={(e) => setWhatsapp({ ...whatsapp, enabled: e.target.checked })} className="h-4 w-4 rounded accent-primary" />
+                Accept payment screenshots via WhatsApp
+              </label>
+              <div className="max-w-md space-y-2">
+                <Label>WhatsApp number</Label>
+                <Input value={whatsapp.number} onChange={(e) => setWhatsapp({ ...whatsapp, number: e.target.value })} className="h-11" placeholder="+92 300 1234567" />
+              </div>
+            </section>
+          </TabsContent>
 
-        <TabsContent value="social">
-          <Card>
-            <CardHeader>
-              <CardTitle>Social Links</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <TabsContent value="social" className="mt-0 space-y-6">
+            <section className="border-b border-border/70 pb-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">05 / Community</p>
+              <h2 className="mt-2 font-heading text-2xl font-medium">Social links</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Connect your restaurant's social profiles.</p>
+            </section>
+            <div className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="instagram">Instagram URL</Label>
-                <Input
-                  id="instagram"
-                  value={social.instagram}
-                  onChange={(e) =>
-                    setSocial({ ...social, instagram: e.target.value })
-                  }
-                />
+                <Input id="instagram" value={social.instagram} onChange={(e) => setSocial({ ...social, instagram: e.target.value })} className="h-11" placeholder="https://instagram.com/..." />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="facebook">Facebook URL</Label>
-                <Input
-                  id="facebook"
-                  value={social.facebook}
-                  onChange={(e) =>
-                    setSocial({ ...social, facebook: e.target.value })
-                  }
-                />
+                <Input id="facebook" value={social.facebook} onChange={(e) => setSocial({ ...social, facebook: e.target.value })} className="h-11" placeholder="https://facebook.com/..." />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="tiktok">TikTok URL</Label>
-                <Input
-                  id="tiktok"
-                  value={social.tiktok}
-                  onChange={(e) =>
-                    setSocial({ ...social, tiktok: e.target.value })
-                  }
-                />
+                <Input id="tiktok" value={social.tiktok} onChange={(e) => setSocial({ ...social, tiktok: e.target.value })} className="h-11" placeholder="https://tiktok.com/@..." />
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="seo">
-          <Card>
-            <CardHeader>
-              <CardTitle>SEO</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <TabsContent value="seo" className="mt-0 space-y-6">
+            <section className="border-b border-border/70 pb-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">06 / Discovery</p>
+              <h2 className="mt-2 font-heading text-2xl font-medium">Search appearance</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Control how your restaurant appears in search results.</p>
+            </section>
+            <div className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="seoTitle">Page Title</Label>
-                <Input
-                  id="seoTitle"
-                  value={seo.title}
-                  onChange={(e) => setSeo({ ...seo, title: e.target.value })}
-                />
+                <Label htmlFor="seoTitle">Page title</Label>
+                <Input id="seoTitle" value={seo.title} onChange={(e) => setSeo({ ...seo, title: e.target.value })} className="h-11" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="seoDescription">Meta Description</Label>
-                <Textarea
-                  id="seoDescription"
-                  rows={3}
-                  value={seo.description}
-                  onChange={(e) =>
-                    setSeo({ ...seo, description: e.target.value })
-                  }
-                />
+                <Label htmlFor="seoDescription">Meta description</Label>
+                <Textarea id="seoDescription" rows={4} value={seo.description} onChange={(e) => setSeo({ ...seo, description: e.target.value })} className="resize-y" />
+                <p className="text-xs text-muted-foreground">A concise description that helps guests understand what your restaurant offers.</p>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <div className="border border-border/70 bg-muted/20 p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Search preview</p>
+                <p className="mt-3 truncate text-base font-medium text-[#1a0dab]">{seo.title || "Your page title"}</p>
+                <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">{seo.description || "Your meta description will appear here."}</p>
+              </div>
+            </div>
+          </TabsContent>
+
+          <div className="flex justify-end border-t border-border/70 pt-5">
+            <Button onClick={handleSave} disabled={saving} className="h-11 gap-2 px-5">
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {saving ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
+        </div>
       </Tabs>
-
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving} size="lg" className="gap-2">
-          {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          Save Changes
-        </Button>
-      </div>
     </div>
   );
 }
